@@ -106,12 +106,28 @@ const servidor = createServer(async (req, res) => {
       return pagina(res, 'index.html');
     }
     if (rota === 'GET /saude') return json(res, 200, { ok: true });
-    if (['/favicon.ico', '/favicon.png', '/favicon-128.png'].includes(url.pathname) && (req.method === 'GET' || req.method === 'HEAD')) {
+    const ARQUIVOS_PWA: Record<string, string> = {
+      '/favicon.ico': 'image/x-icon',
+      '/favicon.png': 'image/png',
+      '/favicon-128.png': 'image/png',
+      '/icon-192.png': 'image/png',
+      '/icon-512.png': 'image/png',
+      '/manifest.json': 'application/manifest+json; charset=utf-8',
+      '/sw.js': 'application/javascript; charset=utf-8',
+    };
+    if (ARQUIVOS_PWA[url.pathname] && (req.method === 'GET' || req.method === 'HEAD')) {
       const nome = url.pathname.slice(1);
       const buf = await readFile(join(PUBLICO, nome)).catch(() => null);
       if (!buf) { res.writeHead(404); return res.end(); }
-      const mime = nome.endsWith('.ico') ? 'image/x-icon' : 'image/png';
-      res.writeHead(200, { ...SEG, 'Content-Type': mime, 'Cache-Control': 'public, max-age=86400' });
+      const headers: Record<string, string> = {
+        ...SEG,
+        'Content-Type': ARQUIVOS_PWA[url.pathname]!,
+        'Cache-Control': url.pathname === '/sw.js' ? 'no-cache' : 'public, max-age=86400',
+      };
+      if (url.pathname === '/sw.js') {
+        headers['Service-Worker-Allowed'] = '/';
+      }
+      res.writeHead(200, headers);
       if (req.method === 'HEAD') return res.end();
       return res.end(buf);
     }

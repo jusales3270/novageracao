@@ -1,0 +1,32 @@
+{
+  "name": "Escola Nova Geração — Matrículas & Gestão",
+  "short_name": "Nova Geração",
+  "description": "Sistema de Matrículas, Contratos e Gestão Escolar — Escola Nova Geração",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F5F7F9",
+  "theme_color": "#1560D0",
+  "lang": "pt-BR",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "/favicon-128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

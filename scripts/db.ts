@@ -15,10 +15,22 @@ import { TABELA_2027 } from '../src/motor/tabela-precos.js';
 try { process.loadEnvFile?.(); } catch {}
 
 const OWNER = process.env.DATABASE_URL_OWNER ?? process.env.DATABASE_URL;
+const isRemote = Boolean(
+  OWNER?.includes('supabase') ||
+  OWNER?.includes('sslmode=') ||
+  process.env.DB_SSL === 'true'
+);
 const cmd = process.argv[2];
 
+function criarClient() {
+  return new pg.Client({
+    connectionString: OWNER,
+    ssl: isRemote ? { rejectUnauthorized: false } : undefined,
+  });
+}
+
 async function migrate() {
-  const c = new pg.Client({ connectionString: OWNER });
+  const c = criarClient();
   await c.connect();
 
   // Garante que o papel ng_app exista antes dos grants
@@ -60,7 +72,7 @@ async function migrate() {
 }
 
 async function seed() {
-  const c = new pg.Client({ connectionString: OWNER });
+  const c = criarClient();
   await c.connect();
   const senhaInicial = process.env.SEED_SENHA_DIRECAO;
   if (!senhaInicial || senhaInicial.length < 12) {

@@ -9,10 +9,17 @@ import pg from 'pg';
 
 try { process.loadEnvFile?.(); } catch {}
 
+const isRemote = Boolean(
+  process.env.DATABASE_URL?.includes('supabase') ||
+  process.env.DATABASE_URL?.includes('sslmode=') ||
+  process.env.DB_SSL === 'true'
+);
+
 export const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
   max: Number(process.env.DB_POOL_MAX ?? 10),
   idleTimeoutMillis: 30_000,
+  ssl: isRemote ? { rejectUnauthorized: false } : undefined,
 });
 
 pg.types.setTypeParser(1700, (v) => Number(v)); // numeric → number (valores monetários com 2 casas)

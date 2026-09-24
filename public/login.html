@@ -4,7 +4,13 @@
 <link rel="icon" type="image/png" sizes="128x128" href="/favicon-128.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-128.png">
 <link rel="shortcut icon" href="/favicon.ico">
-<link rel="apple-touch-icon" href="/favicon-128.png">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#1560D0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Nova Geração">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--fundo:#F5F7F9;--tinta:#131A22;--tinta2:#5B6874;--linha:#DFE5EB;--marca:#1560D0;--marca2:#0E3F8C;--bloq:#C22218}
@@ -43,5 +49,10 @@ document.getElementById('f').addEventListener('submit', async (e) => {
   } catch { erro.textContent = 'Sem conexão com o servidor.'; }
   finally { b.disabled = false; }
 });
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
 </script>
 </body></html>
