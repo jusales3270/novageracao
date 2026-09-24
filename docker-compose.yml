@@ -1,0 +1,46 @@
+services:
+  banco:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ng_owner
+      POSTGRES_PASSWORD: ${DB_SENHA_OWNER:-ng_owner_senha}
+      POSTGRES_DB: novageracao
+      DB_SENHA_APP: ${DB_SENHA_APP:-ng_app_senha}
+    volumes:
+      - dados:/var/lib/postgresql/data
+      - ./db/init-roles.sh:/docker-entrypoint-initdb.d/000_init_roles.sh:ro
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ng_owner -d novageracao"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  app:
+    build: .
+    depends_on:
+      banco: { condition: service_healthy }
+    environment:
+      # a aplicação NÃO usa o papel dono: é o que a mantém sujeita ao RLS
+      DATABASE_URL: postgres://ng_app:${DB_SENHA_APP:-ng_app_senha}@banco:5432/novageracao
+      DATABASE_URL_OWNER: postgres://ng_owner:${DB_SENHA_OWNER:-ng_owner_senha}@banco:5432/novageracao
+      AMBIENTE: ${AMBIENTE:-homologacao}
+      PORTA: 3000
+      CONFIA_PROXY: "true"
+      COOKIE_SEGURO: ${COOKIE_SEGURO:-false}
+      DS_MODO: ${DS_MODO:-mock}
+      DS_OAUTH_BASE: ${DS_OAUTH_BASE:-account-d.docusign.com}
+      DS_INTEGRATION_KEY: ${DS_INTEGRATION_KEY:-}
+      DS_USER_ID: ${DS_USER_ID:-}
+      DS_PRIVATE_KEY: ${DS_PRIVATE_KEY:-}
+      DS_WEBHOOK: ${DS_WEBHOOK:-}
+      DS_CONNECT_HMAC: ${DS_CONNECT_HMAC:-}
+    volumes: [arquivos:/arquivos]
+    ports: ["127.0.0.1:3000:3000"]   # TLS termina no proxy à frente
+    restart: unless-stopped
+
+volumes:
+  dados:
+  arquivos:

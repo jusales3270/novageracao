@@ -1,0 +1,2110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Matrículas — Escola Nova Geração</title>
+<link rel="icon" type="image/png" sizes="128x128" href="/favicon-128.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-128.png">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/favicon-128.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --fundo:#F5F7F9; --superficie:#fff; --tinta:#131A22; --tinta2:#5B6874;
+  --linha:#DFE5EB; --linha2:#EDF1F5;
+  --marca:#1560D0; --marca2:#0E3F8C;
+  --ok:#1A7A4C; --bloq:#C22218; --aten:#9A6B08;
+  --r:4px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fundo);color:var(--tinta);
+  font:15px/1.5 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+::selection{background:#CFE0FA}
+
+.topo{background:var(--superficie);border-bottom:1px solid var(--linha);
+  padding:.5rem clamp(.8rem,3vw,2rem);display:flex;gap:1rem;align-items:center;
+  flex-wrap:wrap;position:sticky;top:0;z-index:30}
+.topo img{height:62px;width:auto;display:block}
+.quem{display:flex;align-items:center;gap:.55rem;font-size:.8rem;color:var(--tinta2)}
+.tags{margin-left:auto;display:flex;gap:.4rem;flex-wrap:wrap}
+.tag{font-family:"IBM Plex Mono",monospace;font-size:.63rem;letter-spacing:.04em;
+  padding:.2rem .48rem;border:1px solid var(--linha);border-radius:var(--r);
+  color:var(--tinta2);cursor:pointer;background:#fff;white-space:nowrap}
+.tag.aten{border-color:var(--aten);color:var(--aten)}
+.tag.ok{border-color:var(--ok);color:var(--ok)}
+.tag:hover{background:#F2F6FB}
+
+.tela{display:grid;grid-template-columns:minmax(0,1fr) 396px;gap:1.2rem;
+  padding:1.2rem clamp(.8rem,3vw,2rem) 4rem;max-width:1520px;margin:0 auto;align-items:start}
+@media(max-width:1060px){.tela{grid-template-columns:1fr}.painel{position:static!important}}
+
+.cartao{background:var(--superficie);border:1px solid var(--linha);border-radius:var(--r);margin-bottom:1rem}
+.cabeca{font-family:Archivo,sans-serif;font-weight:600;font-size:.66rem;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--tinta2);
+  margin:0;padding:.7rem 1rem;border-bottom:1px solid var(--linha2);
+  display:flex;justify-content:space-between;align-items:center;gap:.8rem}
+.corpo{padding:1rem}
+.grade{display:grid;gap:.8rem .9rem;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.g2{grid-column:span 2}@media(max-width:620px){.g2{grid-column:span 1}}
+
+label{display:block;font-size:.66rem;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--tinta2);font-weight:600;margin-bottom:.25rem}
+input,select{width:100%;padding:.48rem .58rem;background:#fff;
+  border:1px solid var(--linha);border-radius:var(--r);outline:none}
+input:focus,select:focus{border-color:var(--marca);box-shadow:0 0 0 3px rgba(21,96,208,.13)}
+input[type=checkbox]{width:auto}
+.dica{font-size:.72rem;color:var(--tinta2);margin-top:.24rem}
+.mini{padding:.26rem .55rem;font-size:.71rem;border:1px solid var(--linha);
+  background:#fff;border-radius:var(--r);cursor:pointer;font-weight:500}
+.mini:hover{background:#F2F6FB;border-color:var(--marca)}
+
+.canal{display:flex;align-items:center;justify-content:space-between;gap:.9rem;
+  padding:.55rem 0;border-bottom:1px solid var(--linha2)}
+.canal:last-child{border-bottom:0}
+.canal p{margin:0;font-size:.89rem}
+.canal small{display:block;color:var(--tinta2);font-size:.71rem}
+.dupla{display:flex;border:1px solid var(--linha);border-radius:var(--r);overflow:hidden;flex:none}
+.dupla button{padding:.3rem .65rem;background:#fff;border:0;cursor:pointer;
+  font-size:.71rem;font-weight:600}
+.dupla button+button{border-left:1px solid var(--linha)}
+.dupla button[aria-pressed=true][data-v=sim]{background:var(--ok);color:#fff}
+.dupla button[aria-pressed=true][data-v=nao]{background:var(--bloq);color:#fff}
+
+.lista-din{display:grid;gap:.5rem}
+.item-din{display:grid;grid-template-columns:1fr 1fr .8fr auto;gap:.4rem;align-items:center}
+@media(max-width:620px){.item-din{grid-template-columns:1fr auto}}
+.rm{border:1px solid var(--linha);background:#fff;border-radius:var(--r);
+  cursor:pointer;padding:.35rem .55rem;color:var(--bloq);font-weight:600;line-height:1}
+
+.painel{position:sticky;top:4.9rem}
+.veredito{padding:.9rem 1rem;border-bottom:1px solid var(--linha2)}
+.decisao{font-family:Archivo,sans-serif;font-weight:700;font-size:1.45rem;line-height:1.1}
+.decisao.ok{color:var(--ok)} .decisao.no{color:var(--bloq)} .decisao.inc{color:var(--aten)}
+.decisao small{display:block;font-family:Inter,sans-serif;font-weight:400;
+  font-size:.77rem;color:var(--tinta2);margin-top:.28rem}
+
+.regra{display:grid;grid-template-columns:1.65rem 1fr;gap:.55rem;
+  padding:.4rem 1rem;align-items:start;font-size:.81rem}
+.regra+.regra{border-top:1px solid var(--linha2)}
+.mk{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:.6rem;
+  width:1.65rem;height:1.3rem;display:grid;place-items:center;
+  border:1px solid currentColor;border-radius:2px}
+.mk.s{color:var(--ok)} .mk.n{color:var(--bloq)} .mk.ed{color:var(--aten)} .mk.z{color:#C6CFD8}
+.regra b{font-weight:500;display:block}
+.regra em{font-style:normal;color:var(--tinta2);font-size:.75rem;display:block;margin-top:.12rem}
+.ref{font-family:"IBM Plex Mono",monospace;font-size:.61rem;color:#8896A4}
+
+.preco{padding:.85rem 1rem;border-top:1px solid var(--linha)}
+.li{display:flex;justify-content:space-between;gap:.9rem;padding:.22rem 0;font-size:.84rem}
+.li span:last-child{font-family:"IBM Plex Mono",monospace;white-space:nowrap}
+.li.total{border-top:1px solid var(--linha);margin-top:.35rem;padding-top:.45rem;font-weight:600}
+.li.desc span:last-child{color:var(--ok)}
+
+.acao{padding:.9rem 1rem;border-top:1px solid var(--linha);display:grid;gap:.5rem}
+.btn{padding:.68rem 1rem;border:0;border-radius:var(--r);background:var(--marca);color:#fff;
+  font-weight:600;font-size:.88rem;cursor:pointer}
+.btn:hover:not(:disabled){background:var(--marca2)}
+.btn:disabled{background:#D3DAE2;color:#8B98A6;cursor:not-allowed}
+.motivo{font-size:.75rem;color:var(--bloq);line-height:1.45}
+
+.oculto{display:none!important}
+.subh{font-family:Archivo,sans-serif;font-weight:600;font-size:.64rem;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--tinta2);margin:1rem 0 .35rem}
+.doc{display:flex;justify-content:space-between;align-items:center;gap:.8rem;
+  padding:.55rem 0;border-bottom:1px solid var(--linha2);font-size:.85rem}
+.doc button{background:none;border:0;color:var(--marca);font-weight:600;cursor:pointer;padding:0;white-space:nowrap}
+.doc button:hover{text-decoration:underline}
+.hash{font-family:"IBM Plex Mono",monospace;font-size:.63rem;color:#8896A4;display:block;word-break:break-all}
+.assinante{display:grid;grid-template-columns:1.5rem 1fr auto;gap:.5rem;padding:.36rem 0;
+  font-size:.83rem;border-bottom:1px solid var(--linha2);align-items:center}
+.ord{font-family:"IBM Plex Mono",monospace;font-size:.68rem;color:var(--tinta2);
+  border:1px solid var(--linha);border-radius:2px;text-align:center;padding:.08rem}
+.papel{font-family:"IBM Plex Mono",monospace;font-size:.62rem;color:#8896A4}
+.trilha{font-family:"IBM Plex Mono",monospace;font-size:.67rem;line-height:1.65;
+  color:var(--tinta2);max-height:190px;overflow:auto}
+.trilha b{color:var(--tinta);font-weight:500}
+
+.modal{position:fixed;inset:0;background:rgba(12,20,30,.55);z-index:50;
+  display:grid;place-items:center;padding:1rem}
+.janela{background:#fff;border-radius:var(--r);width:min(1000px,100%);height:min(90vh,900px);
+  display:flex;flex-direction:column;overflow:hidden}
+.janela header{display:flex;align-items:center;gap:.8rem;padding:.7rem 1rem;
+  border-bottom:1px solid var(--linha)}
+.janela header h3{margin:0;font-family:Archivo,sans-serif;font-size:.82rem;
+  letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+.janela iframe{flex:1;border:0;width:100%;background:#EEF1F4}
+.janela pre{flex:1;margin:0;overflow:auto;padding:1rem;background:#0F1720;color:#CBD8E4;
+  font:12px/1.6 "IBM Plex Mono",monospace}
+
+/* ==================== ARQUITETURA SIDEBAR POPUP & SEÇÕES ==================== */
+body { overflow-x: hidden; }
+
+/* Barra Lateral (Colapsada: 68px de ícones; Expandida: 290px popup flutuante) */
+.sidebar-app {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 68px;
+  background: #FFFFFF;
+  border-right: 1px solid var(--linha);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
+  overflow: hidden;
+  box-shadow: 1px 0 6px rgba(0,0,0,0.04);
+}
+.sidebar-app.expandido {
+  width: 292px;
+  box-shadow: 8px 0 35px rgba(0,0,0,0.14), 2px 0 8px rgba(0,0,0,0.06);
+  background: #FFFFFF;
+}
+
+/* Backdrop para fechar o popup ao clicar fora */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(19, 26, 34, 0.35);
+  backdrop-filter: blur(2px);
+  z-index: 95;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.sidebar-backdrop.visivel {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Topo da Sidebar */
+.sidebar-topo {
+  display: flex;
+  align-items: center;
+  height: 72px;
+  padding: 0 .95rem;
+  border-bottom: 1px solid var(--linha);
+  background: #FFFFFF;
+  flex-shrink: 0;
+}
+.btn-sidebar-toggle {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r);
+  border: 1px solid var(--linha);
+  background: #F8FAFC;
+  color: var(--tinta);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all .15s ease;
+}
+.btn-sidebar-toggle:hover {
+  background: #EEF4FC;
+  border-color: var(--marca);
+  color: var(--marca);
+}
+
+.sidebar-marca-info {
+  margin-left: .85rem;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.sidebar-app.expandido .sidebar-marca-info {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+.sidebar-marca-titulo {
+  font-family: Archivo, sans-serif;
+  font-weight: 700;
+  font-size: .88rem;
+  color: var(--tinta);
+}
+.sidebar-marca-sub {
+  font-size: .67rem;
+  color: var(--tinta2);
+  font-family: "IBM Plex Mono", monospace;
+}
+.btn-sidebar-fechar {
+  display: none;
+  margin-left: auto;
+  background: none;
+  border: 0;
+  color: var(--tinta2);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: .2rem .4rem;
+  border-radius: 4px;
+}
+.sidebar-app.expandido .btn-sidebar-fechar { display: block; }
+.btn-sidebar-fechar:hover { color: var(--tinta); }
+
+/* Itens de Navegação */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+  padding: 1rem .6rem;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #FFFFFF;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: .75rem .65rem;
+  border-radius: 6px;
+  color: var(--tinta2);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all .18s ease;
+  user-select: none;
+}
+.nav-link:hover {
+  background: #F1F5F9;
+  color: var(--tinta);
+}
+.nav-link.ativo {
+  background: #EAF2FC;
+  color: var(--marca);
+  border: 1px solid #C5DCFA;
+}
+.nav-link.ativo .nav-icon { color: var(--marca); }
+
+.nav-icon {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #64748B;
+  transition: color .15s ease;
+}
+.nav-conteudo {
+  margin-left: .95rem;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+}
+.sidebar-app.expandido .nav-conteudo {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+.nav-titulo {
+  font-family: Archivo, sans-serif;
+  font-weight: 600;
+  font-size: .85rem;
+  color: inherit;
+}
+.nav-sub {
+  font-size: .67rem;
+  color: var(--tinta2);
+  margin-top: 1px;
+}
+.nav-link.ativo .nav-sub { color: var(--marca2); }
+
+/* Rodapé da Sidebar */
+.sidebar-rodape {
+  padding: .8rem .6rem;
+  border-top: 1px solid var(--linha);
+  background: #FFFFFF;
+  flex-shrink: 0;
+}
+.sidebar-rodape-card {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  padding: .45rem;
+  border-radius: 8px;
+  background: #F8FAFC;
+  border: 1px solid var(--linha2);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  user-select: none;
+}
+.sidebar-rodape-card:hover {
+  background: #F1F5F9;
+  border-color: #CBD5E1;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+.avatar-usuario {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--marca);
+  color: #fff;
+  font-weight: 700;
+  font-size: .78rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.avatar-usuario:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 3px rgba(30, 90, 220, 0.25);
+}
+.avatar-usuario img.avatar-img-foto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+.usuario-info {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  pointer-events: none;
+  overflow: hidden;
+}
+.sidebar-app.expandido .usuario-info {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+.usuario-nome-side { font-size: .78rem; font-weight: 600; color: var(--tinta); }
+.usuario-papel-side { font-size: .64rem; color: var(--tinta2); font-family: "IBM Plex Mono", monospace; text-transform: uppercase; }
+
+/* Topo Principal */
+.topo {
+  margin-left: 68px;
+  transition: margin-left 0.22s ease;
+}
+
+/* Área de Conteúdo Principal */
+.conteudo-principal {
+  margin-left: 68px;
+  min-height: calc(100vh - 75px);
+  transition: margin-left 0.22s ease;
+}
+.secao-view { width: 100%; }
+
+/* Estilos das Novas Telas (Dashboard, Alunos, Configurações) */
+.secao-wrap {
+  padding: 1.5rem clamp(.8rem, 3vw, 2.2rem) 4rem;
+  max-width: 1520px;
+  margin: 0 auto;
+}
+.secao-banner {
+  margin-bottom: 1.6rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.secao-banner h1 {
+  margin: 0 0 .3rem;
+  font-family: Archivo, sans-serif;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--tinta);
+  letter-spacing: -.01em;
+}
+.secao-banner p { margin: 0; font-size: .88rem; color: var(--tinta2); }
+
+/* KPI Cards */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.6rem;
+}
+.kpi-card {
+  background: #fff;
+  border: 1px solid var(--linha);
+  border-radius: var(--r);
+  padding: 1.1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--marca);
+}
+.kpi-card.ok::before { background: var(--ok); }
+.kpi-card.aten::before { background: var(--aten); }
+.kpi-card.bloq::before { background: var(--bloq); }
+
+.kpi-rotulo {
+  font-size: .68rem;
+  font-family: Archivo, sans-serif;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--tinta2);
+  font-weight: 600;
+  margin-bottom: .4rem;
+}
+.kpi-valor {
+  font-size: 1.7rem;
+  font-weight: 700;
+  font-family: Archivo, sans-serif;
+  color: var(--tinta);
+  line-height: 1.1;
+  margin-bottom: .35rem;
+}
+.kpi-sub { font-size: .75rem; color: var(--tinta2); }
+
+/* Tabela de Alunos */
+.barra-filtros {
+  display: flex;
+  gap: .6rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.busca-input-wrap {
+  flex: 1;
+  min-width: 240px;
+  position: relative;
+}
+.busca-input-wrap input { padding-left: 2.1rem; }
+.busca-input-wrap .busca-icone {
+  position: absolute;
+  left: .7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #8896A4;
+  font-size: .9rem;
+}
+.tabela-dados-wrap {
+  background: #fff;
+  border: 1px solid var(--linha);
+  border-radius: var(--r);
+  overflow-x: auto;
+}
+.tabela-dados {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .83rem;
+}
+.tabela-dados th {
+  background: #F8FAFC;
+  padding: .75rem .9rem;
+  text-align: left;
+  font-family: Archivo, sans-serif;
+  font-size: .66rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--tinta2);
+  border-bottom: 1px solid var(--linha);
+  white-space: nowrap;
+}
+.tabela-dados td {
+  padding: .75rem .9rem;
+  border-bottom: 1px solid var(--linha2);
+  color: var(--tinta);
+  vertical-align: middle;
+}
+.tabela-dados tr:hover td { background: #F8FAFC; }
+.badge-tag {
+  display: inline-block;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .65rem;
+  padding: .15rem .45rem;
+  border-radius: 3px;
+  background: #EEF3FA;
+  color: var(--marca2);
+  font-weight: 600;
+}
+.badge-tag.irmaos { background: #E8F5E9; color: #1B5E20; }
+.badge-tag.alerta { background: #FFF8E1; color: #B78103; }
+
+/* Grid de Configurações */
+.config-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.2rem;
+}
+.config-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .6rem 0;
+  border-bottom: 1px solid var(--linha2);
+  font-size: .83rem;
+}
+.config-item:last-child { border-bottom: 0; }
+.config-item .label { color: var(--tinta2); font-weight: 500; }
+.config-item .val { font-family: "IBM Plex Mono", monospace; font-weight: 600; color: var(--tinta); }
+
+/* Modal de Perfil & Configurações da Conta */
+.janela-perfil {
+  background: #ffffff;
+  border-radius: 14px;
+  width: min(520px, 94vw);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 50px -10px rgba(15, 23, 42, 0.35);
+  border: 1px solid var(--linha);
+  overflow: hidden;
+  animation: modalPopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modalPopIn {
+  from { opacity: 0; transform: scale(0.96) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.janela-perfil-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .9rem 1.2rem;
+  border-bottom: 1px solid var(--linha);
+  background: #FAFCFE;
+}
+.icone-perfil-head {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #EEF3FA;
+  color: var(--marca2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.janela-perfil-header h3 {
+  margin: 0;
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--tinta);
+}
+.modal-perfil-sub {
+  margin: .15rem 0 0;
+  font-size: .73rem;
+  color: var(--tinta2);
+}
+.btn-fechar-modal {
+  background: transparent;
+  border: 0;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--tinta2);
+  cursor: pointer;
+  padding: .2rem .4rem;
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-fechar-modal:hover {
+  background: #EEF2F6;
+  color: var(--tinta);
+}
+.janela-perfil-corpo {
+  padding: 1.2rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.perfil-foto-secao {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+.perfil-avatar-preview-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+.perfil-avatar-preview {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--marca);
+  color: #fff;
+  font-size: 1.6rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(30, 90, 220, 0.25);
+  border: 3px solid #ffffff;
+  outline: 2px solid var(--linha);
+}
+.perfil-avatar-preview img.avatar-img-foto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.btn-badge-camera {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--marca);
+  color: #fff;
+  border: 2px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transition: transform 0.15s, background 0.15s;
+}
+.btn-badge-camera:hover {
+  transform: scale(1.1);
+  background: var(--marca2);
+}
+.perfil-foto-controles {
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+  flex: 1;
+}
+.dica-foto {
+  font-size: .68rem;
+  color: var(--tinta2);
+}
+.perfil-presets-lista {
+  display: flex;
+  gap: .45rem;
+  margin-top: .15rem;
+}
+.btn-preset-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--linha);
+  padding: 0;
+  cursor: pointer;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: transform 0.15s, border-color 0.15s;
+}
+.btn-preset-avatar:hover {
+  transform: scale(1.15);
+  border-color: var(--marca);
+}
+.btn-preset-avatar svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.perfil-divisor {
+  border: 0;
+  border-top: 1px solid var(--linha2);
+  margin: 0;
+}
+.perfil-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .8rem;
+}
+.input-bloqueado {
+  background: #F8FAFC !important;
+  color: var(--tinta2) !important;
+  cursor: not-allowed;
+  border-color: var(--linha2) !important;
+}
+.perfil-secao-senha {
+  background: #F8FAFC;
+  border: 1px solid var(--linha2);
+  border-radius: 8px;
+  padding: .8rem .9rem;
+}
+.alerta-perfil {
+  padding: .6rem .8rem;
+  border-radius: 6px;
+  font-size: .78rem;
+  line-height: 1.4;
+  font-weight: 500;
+}
+.alerta-perfil.sucesso {
+  background: #E8F5E9;
+  color: #1B5E20;
+  border: 1px solid #A5D6A7;
+}
+.alerta-perfil.erro {
+  background: #FFEBEE;
+  color: #B71C1C;
+  border: 1px solid #FFCDD2;
+}
+.janela-perfil-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .8rem 1.2rem;
+  border-top: 1px solid var(--linha);
+  background: #FAFCFE;
+}
+.btn-perfil-sair {
+  background: transparent;
+  color: #C62828;
+  border: 1px solid #FFCDD2;
+  font-size: .78rem;
+  font-weight: 600;
+  padding: .45rem .8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  transition: all 0.15s;
+}
+.btn-perfil-sair:hover {
+  background: #FFEBEE;
+  border-color: #EF5350;
+  color: #B71C1C;
+}
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <img src="data:image/png;base64,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" alt="Nova Geração — Educação por Princípios">
+  <div class="tags" id="tags"></div>
+  <div class="quem"><span id="quemNome"></span><span class="papel" id="quemPapel"></span><button class="mini" id="btnSair">Sair</button></div>
+</header>
+
+<!-- Backdrop para fechar o popup ao clicar fora -->
+<div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
+<!-- Barra Lateral (Colapsada por padrão, expande como popup sobre o painel) -->
+<aside id="sidebarApp" class="sidebar-app" aria-label="Menu Principal">
+  <div class="sidebar-topo">
+    <button id="btnSidebarToggle" class="btn-sidebar-toggle" title="Menu Expandir / Colapsar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+    <div class="sidebar-marca-info">
+      <div class="sidebar-marca-titulo">Nova Geração</div>
+      <div class="sidebar-marca-sub">Ciclo Matrículas 2027</div>
+    </div>
+    <button id="btnSidebarFechar" class="btn-sidebar-fechar" title="Fechar menu">✕</button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a class="nav-link" data-secao="view-dashboard">
+      <div class="nav-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+      </div>
+      <div class="nav-conteudo">
+        <span class="nav-titulo">Dashboard</span>
+        <span class="nav-sub">Visão geral & indicadores</span>
+      </div>
+    </a>
+
+    <a class="nav-link" data-secao="view-alunos">
+      <div class="nav-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      </div>
+      <div class="nav-conteudo">
+        <span class="nav-titulo">Alunos</span>
+        <span class="nav-sub">Base cadastral & turmas</span>
+      </div>
+    </a>
+
+    <a class="nav-link ativo" data-secao="view-documentacao">
+      <div class="nav-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+      </div>
+      <div class="nav-conteudo">
+        <span class="nav-titulo">Documentação</span>
+        <span class="nav-sub">Requerimento & contrato</span>
+      </div>
+    </a>
+
+    <a class="nav-link" data-secao="view-configuracoes">
+      <div class="nav-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </div>
+      <div class="nav-conteudo">
+        <span class="nav-titulo">Configurações</span>
+        <span class="nav-sub">Governança & parâmetros</span>
+      </div>
+    </a>
+  </nav>
+
+  <div class="sidebar-rodape">
+    <div class="sidebar-rodape-card" id="sidebarCardUsuario" title="Meu Perfil & Configurações (clique para abrir)">
+      <div class="avatar-usuario" id="sidebarAvatar" title="Meu Perfil & Configurações">NG</div>
+      <div class="usuario-info">
+        <div class="usuario-nome-side" id="sidebarNome">Operador</div>
+        <div class="usuario-papel-side" id="sidebarPapel">Secretaria</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- Área de Conteúdo Principal -->
+<div class="conteudo-principal">
+
+<!-- ==================== SEÇÃO 1: DASHBOARD ==================== -->
+<section id="view-dashboard" class="secao-view oculto">
+  <div class="secao-wrap">
+    <div class="secao-banner">
+      <div>
+        <h1>Dashboard Geral · Ano Letivo 2027</h1>
+        <p>Visão executiva em tempo real de matrículas, ocupação de turmas e assinaturas</p>
+      </div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <button class="mini" style="background:var(--marca);color:#fff;border-color:var(--marca);font-weight:600" onclick="mudarSecao('view-documentacao')">+ Nova Matrícula</button>
+        <button class="mini" onclick="mudarSecao('view-alunos')">Base de Alunos (84)</button>
+        <button class="mini" onclick="mudarSecao('view-configuracoes')">Parâmetros & Tabela</button>
+      </div>
+    </div>
+
+    <!-- 4 KPIs principais -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <span class="kpi-rotulo">Capacidade / Base Ativa</span>
+        <span class="kpi-valor" id="dashTotalBase">84</span>
+        <span class="kpi-sub">Alunos identificados para rematrícula</span>
+      </div>
+      <div class="kpi-card ok">
+        <span class="kpi-rotulo">Matrículas Liberadas / Concluídas</span>
+        <span class="kpi-valor">62</span>
+        <span class="kpi-sub">Contratos emitidos ou conformes (73.8%)</span>
+      </div>
+      <div class="kpi-card aten">
+        <span class="kpi-rotulo">Em Assinatura Docusign</span>
+        <span class="kpi-valor">15</span>
+        <span class="kpi-sub">Envelopes tramitando no Connect</span>
+      </div>
+      <div class="kpi-card bloq">
+        <span class="kpi-rotulo">Gaps Pendentes da Escola</span>
+        <span class="kpi-valor">2</span>
+        <span class="kpi-sub">R-01/R-02 (Berçário integral)</span>
+      </div>
+    </div>
+
+    <!-- Grids de Conteúdo -->
+    <div class="grade" style="grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:1.2rem;margin-bottom:1.5rem">
+      <!-- Ocupação por Turma -->
+      <div class="cartao" style="margin-bottom:0">
+        <div class="cabeca">Distribuição & Ocupação por Turma (2027)</div>
+        <div class="corpo">
+          <div style="display:flex;flex-direction:column;gap:.9rem">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.25rem">
+                <b>Berçário I (A e B)</b> <span class="badge-tag alerta">14 alunos · R-01 bloqueia integral</span>
+              </div>
+              <div style="height:7px;background:var(--linha2);border-radius:4px;overflow:hidden">
+                <div style="width:70%;height:100%;background:var(--aten)"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.25rem">
+                <b>Mini-Maternal (A e B)</b> <span class="badge-tag">18 alunos · 90% ocupado</span>
+              </div>
+              <div style="height:7px;background:var(--linha2);border-radius:4px;overflow:hidden">
+                <div style="width:90%;height:100%;background:var(--marca)"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.25rem">
+                <b>Maternal (A e B)</b> <span class="badge-tag">22 alunos · 88% ocupado</span>
+              </div>
+              <div style="height:7px;background:var(--linha2);border-radius:4px;overflow:hidden">
+                <div style="width:88%;height:100%;background:var(--marca)"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.25rem">
+                <b>Jardim (A e B)</b> <span class="badge-tag">15 alunos · 75% ocupado</span>
+              </div>
+              <div style="height:7px;background:var(--linha2);border-radius:4px;overflow:hidden">
+                <div style="width:75%;height:100%;background:var(--marca)"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.25rem">
+                <b>Alfa I (A e B)</b> <span class="badge-tag ok">24 alunos · 96% ocupado</span>
+              </div>
+              <div style="height:7px;background:var(--linha2);border-radius:4px;overflow:hidden">
+                <div style="width:96%;height:100%;background:var(--ok)"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:.25rem">
+                <b>Alfa II (A e B)</b> <span class="badge-tag">16 alunos · 80% ocupado</span>
+              </div>
+              <div style="height:7px;background:var(--linha2);border-radius:4px;overflow:hidden">
+                <div style="width:80%;height:100%;background:var(--marca)"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Funil e Doutrina -->
+      <div class="cartao" style="margin-bottom:0">
+        <div class="cabeca">Doutrina & Motor de Decisão no Servidor</div>
+        <div class="corpo" style="font-size:.84rem;color:var(--tinta2);line-height:1.6">
+          <p style="margin:0 0 .8rem">O motor roda <b>fail-closed no backend</b>: o navegador desenha o veredito mas não o produz. Cada regra bloqueante impede a geração de documento.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:1rem">
+            <div style="padding:.7rem;border:1px solid var(--linha2);border-radius:var(--r);background:#F8FAFC">
+              <b style="color:var(--tinta);display:block;font-size:.8rem">Fonte Única de Preço</b>
+              <span style="font-size:.74rem">Anuidade = Mensalidade × 12 derivado pelo servidor.</span>
+            </div>
+            <div style="padding:.7rem;border:1px solid var(--linha2);border-radius:var(--r);background:#F8FAFC">
+              <b style="color:var(--tinta);display:block;font-size:.8rem">Perfil da Sessão</b>
+              <span style="font-size:.74rem">Operador e alçada validados por token criptografado.</span>
+            </div>
+            <div style="padding:.7rem;border:1px solid var(--linha2);border-radius:var(--r);background:#F8FAFC">
+              <b style="color:var(--tinta);display:block;font-size:.8rem">5 Signatários</b>
+              <span style="font-size:.74rem">Contratante, Resp. Financeiro, Escola e 2 Testemunhas.</span>
+            </div>
+            <div style="padding:.7rem;border:1px solid var(--linha2);border-radius:var(--r);background:#F8FAFC">
+              <b style="color:var(--tinta);display:block;font-size:.8rem">Ledger Imutável</b>
+              <span style="font-size:.74rem">Hash SHA-256 e trilha append-only com RLS ativo.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SEÇÃO 2: ALUNOS ==================== -->
+<section id="view-alunos" class="secao-view oculto">
+  <div class="secao-wrap">
+    <div class="secao-banner">
+      <div>
+        <h1>Base de Alunos & Enturmação</h1>
+        <p>Registros da Educação Infantil extraídos do relatório da escola para rematrículas 2027</p>
+      </div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <button class="mini" style="background:var(--marca);color:#fff;border-color:var(--marca);font-weight:600" onclick="mudarSecao('view-documentacao')">+ Nova Matrícula</button>
+      </div>
+    </div>
+
+    <!-- Barra de Filtros e Busca -->
+    <div class="barra-filtros">
+      <div class="busca-input-wrap">
+        <span class="busca-icone">🔍</span>
+        <input type="text" id="buscaAluno" placeholder="Buscar aluno por nome, R.A ou responsável...">
+      </div>
+      <select id="filtroTurmaAluno" style="width:auto;min-width:180px">
+        <option value="">Todas as Turmas (84)</option>
+        <option value="ALFA I">Alfa I (A e B)</option>
+        <option value="ALFA II">Alfa II (A e B)</option>
+        <option value="BERCARIO">Berçário I (A e B)</option>
+        <option value="MINI - MATERNAL">Mini-Maternal (A e B)</option>
+        <option value="MATERNAL">Maternal (A e B)</option>
+        <option value="JARDIM">Jardim (A e B)</option>
+      </select>
+      <select id="filtroIrmaosAluno" style="width:auto;min-width:160px">
+        <option value="">Todos os Vínculos</option>
+        <option value="irmaos">Com Irmãos na Escola</option>
+        <option value="sem_ra">R.A Pendente</option>
+      </select>
+    </div>
+
+    <!-- Tabela de Alunos -->
+    <div class="tabela-dados-wrap">
+      <table class="tabela-dados" id="tabelaAlunos">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome do Aluno</th>
+            <th>R.A</th>
+            <th>Turma / Turno</th>
+            <th>Mãe / Responsável</th>
+            <th>CPF Responsável</th>
+            <th>Vínculos / Irmãos</th>
+            <th style="text-align:right">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="corpoTabelaAlunos">
+          <!-- Linhas renderizadas dinamicamente via JS a partir da base do PDF -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SEÇÃO 3: DOCUMENTAÇÃO (TELA ATUAL) ==================== -->
+<section id="view-documentacao" class="secao-view">
+<main class="tela">
+  <div>
+    <div class="cartao">
+      <div class="cabeca">Matrícula
+        <span style="display:flex;gap:.35rem">
+          <button class="mini" id="btnExemplo">Preencher exemplo</button>
+          <button class="mini" id="btnLimpar">Limpar</button>
+        </span>
+      </div>
+      <div class="corpo grade">
+        <div><label>Ano letivo</label><input id="anoLetivo" type="number" value="2027"></div>
+        <div><label>Tipo</label><select id="tipo"><option value="REMATRICULA">Rematrícula</option><option value="MATRICULA">Matrícula nova</option></select></div>
+        <div><label>Atendente</label><input id="opNome" disabled></div>
+        <div><label>Perfil</label><input id="opPapel" disabled></div>
+</div>
+    </div>
+
+    <div class="cartao">
+      <div class="cabeca">Aluno</div>
+      <div class="corpo grade">
+        <div class="g2"><label>Nome completo</label><input id="alNome" placeholder="Nome do aluno"></div>
+        <div><label>Nascimento</label><input id="alNasc" type="date"></div>
+        <div class="g2"><label>Endereço</label><input id="alEnd" placeholder="Rua, número"></div>
+        <div><label>Bairro</label><input id="alBairro"></div>
+        <div><label>Cidade</label><input id="alCidade" value="Itu"></div>
+        <div><label>CEP</label><input id="alCep" placeholder="13300-000"></div>
+        <div class="g2"><label>Irmãos na escola</label><input id="alIrmaos" placeholder="Miguel, 7 anos"></div>
+      </div>
+    </div>
+
+    <div class="cartao">
+      <div class="cabeca">Serviços contratados</div>
+      <div class="corpo grade">
+        <div><label>Turma</label><select id="turma">
+          <option value="BERCARIO">Berçário</option><option value="MINI_MATERNAL">Mini-Maternal</option>
+          <option value="MATERNAL">Maternal</option><option value="JARDIM">Jardim</option>
+          <option value="ALFA_I" selected>Alfa I</option><option value="ALFA_II">Alfa II</option>
+        </select></div>
+        <div><label>Período</label><select id="periodo">
+          <option value="MEIO">½ período</option><option value="INTEGRAL" selected>Integral</option>
+        </select></div>
+        <div><label>Alimentação</label><select id="alimentacao">
+          <option value="NENHUMA">Nenhuma</option><option value="ALMOCO">Almoço — R$ 570</option>
+          <option value="ALMOCO_JANTAR">Almoço e jantar — R$ 800</option>
+          <option value="ALMOCO_OU_JANTAR">Almoço ou jantar — R$ 530</option>
+        </select></div>
+        <div><label>Fraldário</label><select id="fraldario">
+          <option value="NENHUM">Nenhum</option><option value="MEIO">½ período — R$ 270</option>
+          <option value="INTEGRAL">Integral — R$ 485</option><option value="AVULSO">Avulso — R$ 27</option>
+        </select></div>
+        <div><label>Time Care — dias/mês</label><input id="horaAdic" type="number" min="0" max="31" value="0"></div>
+        <div><label>Condição de matrícula</label><select id="forma">
+          <option value="AVISTA_ATE_31_08">Pix/TED até 31/08 — 50%</option>
+          <option value="AVISTA_ATE_15_09">Pix/TED até 15/09 — 45%</option>
+          <option value="AVISTA_1X">Cartão 1× — 40%</option>
+          <option value="CARTAO_2X">Cartão 2× — 35%</option>
+          <option value="CARTAO_3X">Cartão 3× — 20%</option>
+          <option value="CARTAO_4X">Cartão 4× — 10%</option>
+          <option value="CARTAO_5X">Cartão 5× — 5%</option>
+          <option value="CARTAO_6X">Cartão 6× — sem desconto</option>
+        </select></div>
+        <div><label>Desconto excepcional (%)</label><input id="descPct" type="number" min="0" max="100" value="0">
+          <div class="dica">Secretaria e coordenação até 10%. Acima, só direção.</div></div>
+        <div><label>Justificativa</label><input id="descJust" placeholder="Ex.: segundo irmão"></div>
+      </div>
+    </div>
+
+    <div class="cartao">
+      <div class="cabeca">Responsáveis</div>
+      <div class="corpo">
+        <div class="grade">
+          <div class="g2"><label>Contratante / responsável legal</label><input id="ctNome"></div>
+          <div><label>CPF</label><input id="ctCpf" placeholder="000.000.000-00"></div>
+          <div><label>Telefone</label><input id="ctFone"></div>
+          <div class="g2"><label>E-mail</label><input id="ctEmail" type="email"></div>
+        </div>
+        <div style="margin:.85rem 0 .5rem;display:flex;gap:.5rem;align-items:center">
+          <input type="checkbox" id="mesmoFin" checked>
+          <label for="mesmoFin" style="margin:0;text-transform:none;letter-spacing:0;font-size:.85rem;font-weight:400">
+            O responsável financeiro é a mesma pessoa</label>
+        </div>
+        <div class="grade oculto" id="blocoFin">
+          <div class="g2"><label>Responsável financeiro — cobrança</label><input id="fiNome"></div>
+          <div><label>CPF</label><input id="fiCpf"></div>
+          <div><label>Telefone</label><input id="fiFone"></div>
+          <div class="g2"><label>E-mail</label><input id="fiEmail" type="email"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cartao">
+      <div class="cabeca">Ficha de saúde</div>
+      <div class="corpo grade">
+        <div><label>Uso contínuo de medicamento</label><select id="sdMed"><option value="nao">Não</option><option value="sim">Sim</option></select></div>
+        <div><label>Qual medicamento</label><input id="sdMedQual"></div>
+        <div><label>Alergia</label><select id="sdAlerg"><option value="nao">Não</option><option value="sim">Sim</option></select></div>
+        <div><label>Qual alergia</label><input id="sdAlergQual"></div>
+        <div><label>Intolerância alimentar</label><input id="sdIntol"></div>
+        <div><label>Convênio</label><input id="sdConv"></div>
+        <div class="g2"><label>Antitérmico autorizado</label><input id="sdAnti" placeholder="Exige prescrição médica — Cl. 13ª §1º"></div>
+        <div><label>Prescrição médica anexada</label><select id="sdPresc"><option value="sim">Sim</option><option value="nao">Não</option></select></div>
+        <div><label>Emergência — nome</label><input id="sdEmNome"></div>
+        <div><label>Emergência — telefone</label><input id="sdEmFone"></div>
+      </div>
+    </div>
+
+    <div class="cartao">
+      <div class="cabeca">Autorizados a retirar o aluno
+        <button class="mini" id="btnAddAut">+ adicionar</button></div>
+      <div class="corpo">
+        <div class="lista-din" id="listaAut"></div>
+        <div class="dica" id="dicaAut" style="margin-top:.5rem">Além dos responsáveis legais. Cl. 12ª §1º.</div>
+        <div style="margin-top:.8rem"><label>Restrição judicial de guarda ou contato</label>
+          <input id="alRestr" placeholder="Deixe em branco se não houver"></div>
+      </div>
+    </div>
+
+    <div class="cartao">
+      <div class="cabeca">Autorização de imagem — por finalidade</div>
+      <div class="corpo" id="canais"></div>
+      <div class="corpo" style="border-top:1px solid var(--linha2)">
+        <p class="dica" style="margin:0">Cláusula 16ª: específica, destacada, facultativa e revogável.
+        Cada finalidade é decidida em separado e a vigência fica registrada — o sistema responde
+        “esta foto podia ser publicada naquela data?”, não apenas “pode hoje?”.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="painel">
+    <div class="cartao">
+      <div class="cabeca">Motor determinístico <span class="papel" id="hashLogico"></span></div>
+      <div class="veredito">
+        <div class="decisao inc" id="decisao">AGUARDANDO<small id="decisaoSub">Preencha o formulário.</small></div>
+      </div>
+      <div id="regras"></div>
+      <div class="preco oculto" id="preco"></div>
+      <div class="acao">
+        <button class="btn" id="btnEmitir" disabled>Gerar documentos e enviar para assinatura</button>
+        <div class="motivo" id="motivo"></div>
+      </div>
+    </div>
+
+    <div class="cartao oculto" id="resultado">
+      <div class="cabeca">Emitido</div>
+      <div class="corpo">
+        <div class="papel" id="resId" style="margin-bottom:.6rem"></div>
+        <div id="resDocs"></div>
+        <div class="subh">Envelope Docusign</div>
+        <div class="papel" id="resEnv" style="margin-bottom:.45rem"></div>
+        <div id="resAss"></div>
+        <div class="subh">Cadeia de evidência</div>
+        <div class="trilha" id="resTrilha"></div>
+      </div>
+    </div>
+  </div>
+</main>
+</section><!-- /view-documentacao -->
+
+<!-- ==================== SEÇÃO 4: CONFIGURAÇÕES ==================== -->
+<section id="view-configuracoes" class="secao-view oculto">
+  <div class="secao-wrap">
+    <div class="secao-banner">
+      <div>
+        <h1>Configurações da Plataforma</h1>
+        <p>Governança, conformidade LGPD, parâmetros da escola e integração de assinaturas</p>
+      </div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <button class="mini" onclick="carregaConfig()">Atualizar Status</button>
+      </div>
+    </div>
+
+    <div class="config-grid">
+      <!-- Card Escola -->
+      <div class="cartao">
+        <div class="cabeca">Instituição de Ensino</div>
+        <div class="corpo">
+          <div class="config-item"><span class="label">Razão Social</span><span class="val">CNG EDUCAÇÃO LTDA ME</span></div>
+          <div class="config-item"><span class="label">Nome Fantasia</span><span class="val">Escola Nova Geração</span></div>
+          <div class="config-item"><span class="label">CNPJ</span><span class="val">07.694.200/0001-30</span></div>
+          <div class="config-item"><span class="label">Endereço</span><span class="val">Rua Dr. José Paula Leite de Barros, 136 — Itu/SP</span></div>
+          <div class="config-item"><span class="label">E-mail Oficial</span><span class="val">secretaria@novageracaoitu.com.br</span></div>
+          <div class="config-item"><span class="label">Ambiente Atual</span><span class="val badge-tag" id="confAmbiente">homologacao</span></div>
+        </div>
+      </div>
+
+      <!-- Card Tabela de Preços -->
+      <div class="cartao">
+        <div class="cabeca">Tabela de Preços 2027</div>
+        <div class="corpo">
+          <div class="config-item"><span class="label">Ano Letivo</span><span class="val">2027</span></div>
+          <div class="config-item"><span class="label">Matrícula Cheia</span><span class="val">R$ 3.834,60</span></div>
+          <div class="config-item"><span class="label">Desc. Pontualidade</span><span class="val">5,00%</span></div>
+          <div class="config-item"><span class="label">Alçada Secretaria</span><span class="val">Até 10%</span></div>
+          <div class="config-item"><span class="label">Alçada Direção</span><span class="val">Até 20% (com justificativa)</span></div>
+          <div class="config-item"><span class="label">Aprovação Formal</span><span class="val badge-tag ok" id="confAprovada">Marlene Modesto (Direção)</span></div>
+        </div>
+      </div>
+
+      <!-- Card Testemunhas -->
+      <div class="cartao">
+        <div class="cabeca">Testemunhas do Contrato (CPC art. 784, III)</div>
+        <div class="corpo">
+          <div class="config-item">
+            <div>
+              <b style="display:block;font-size:.82rem">Vanessa Prado</b>
+              <span style="font-size:.73rem;color:var(--tinta2)">CPF: 529.982.247-25 · Ativa</span>
+            </div>
+            <span class="badge-tag ok">Confirmada</span>
+          </div>
+          <div class="config-item">
+            <div>
+              <b style="display:block;font-size:.82rem">Juliana Retz</b>
+              <span style="font-size:.73rem;color:var(--tinta2)">CPF: 153.509.460-56 · Ativa</span>
+            </div>
+            <span class="badge-tag ok">Confirmada</span>
+          </div>
+          <div class="dica" style="margin-top:.6rem">As testemunhas assinam em paralelo pelo Docusign e preservam a força de título executivo extrajudicial do contrato escolar.</div>
+        </div>
+      </div>
+
+      <!-- Card Docusign & LGPD -->
+      <div class="cartao">
+        <div class="cabeca">Integração de Assinaturas & LGPD</div>
+        <div class="corpo">
+          <div class="config-item"><span class="label">Provedor</span><span class="val">Docusign eSignature (JWT Grant)</span></div>
+          <div class="config-item"><span class="label">Modo Operacional</span><span class="val badge-tag" id="confDocusign">MOCK (Local)</span></div>
+          <div class="config-item"><span class="label">Webhook Connect</span><span class="val">Ativo · Idempotente</span></div>
+          <div class="config-item"><span class="label">DPA (LGPD Art. 39)</span><span class="val badge-tag" id="confDpa">Pendente de assinatura</span></div>
+          <div class="config-item"><span class="label">Cláusula 16ª (Imagem)</span><span class="val">5 canais granulares revogáveis</span></div>
+          <div class="dica" style="margin-top:.6rem">Em ambiente de produção, a regra R-12 bloqueia a emissão caso o DPA de operador não esteja registrado.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /conteudo-principal -->
+
+<div class="modal oculto" id="modal">
+  <div class="janela">
+    <header>
+      <h3 id="modalTitulo"></h3>
+      <span style="margin-left:auto;display:flex;gap:.4rem">
+        <button class="mini" id="btnImprimir">Imprimir / salvar PDF</button>
+        <button class="mini" id="btnFechar">Fechar</button>
+      </span>
+    </header>
+    <iframe id="modalFrame" class="oculto"></iframe>
+    <pre id="modalPre" class="oculto"></pre>
+  </div>
+</div>
+
+<!-- ==================== MODAL DE PERFIL DO USUÁRIO ==================== -->
+<div class="modal oculto" id="modalPerfil" role="dialog" aria-modal="true" aria-labelledby="modalPerfilTitulo">
+  <div class="janela-perfil">
+    <!-- Cabeçalho -->
+    <div class="janela-perfil-header">
+      <div style="display:flex;align-items:center;gap:.6rem">
+        <div class="icone-perfil-head">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </div>
+        <div>
+          <h3 id="modalPerfilTitulo">Meu Perfil & Configurações</h3>
+          <p class="modal-perfil-sub">Personalize seu cadastro, foto e segurança da conta</p>
+        </div>
+      </div>
+      <button type="button" class="btn-fechar-modal" id="btnFecharPerfilX" title="Fechar">&times;</button>
+    </div>
+
+    <!-- Conteúdo -->
+    <div class="janela-perfil-corpo">
+      
+      <!-- Seção: Foto e Avatar -->
+      <div class="perfil-foto-secao">
+        <div class="perfil-avatar-preview-wrap">
+          <div class="perfil-avatar-preview" id="perfilAvatarPreview" title="Foto ou iniciais de exibição">
+            <span id="perfilAvatarTexto">NG</span>
+          </div>
+          <button type="button" class="btn-badge-camera" id="btnGatilhoFoto" title="Alterar foto de perfil">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+          </button>
+        </div>
+        
+        <div class="perfil-foto-controles">
+          <input type="file" id="inputFotoArquivo" accept="image/png, image/jpeg, image/webp" style="display:none">
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+            <button type="button" class="mini" id="btnUploadFoto" style="font-weight:600;display:inline-flex;align-items:center;gap:.35rem">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              Escolher Foto
+            </button>
+            <button type="button" class="mini sec" id="btnRemoverFoto" title="Voltar a exibir as iniciais de texto">
+              Remover Foto
+            </button>
+          </div>
+          <span class="dica-foto">Envie sua imagem ou selecione um avatar rápido:</span>
+          
+          <!-- Presets de Avatares -->
+          <div class="perfil-presets-lista" id="perfilPresetsLista">
+            <button type="button" class="btn-preset-avatar" data-preset="1" title="Avatar Direção (Azul)">
+              <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#1E5ADC"/><circle cx="20" cy="15" r="7" fill="#ffffff"/><path d="M7 36c0-7 6-11 13-11s13 4 13 11" fill="#ffffff"/></svg>
+            </button>
+            <button type="button" class="btn-preset-avatar" data-preset="2" title="Avatar Coordenação (Esmeralda)">
+              <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#0D9488"/><circle cx="20" cy="15" r="7" fill="#ffffff"/><path d="M7 36c0-7 6-11 13-11s13 4 13 11" fill="#ffffff"/></svg>
+            </button>
+            <button type="button" class="btn-preset-avatar" data-preset="3" title="Avatar Secretaria (Violeta)">
+              <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#7C3AED"/><circle cx="20" cy="15" r="7" fill="#ffffff"/><path d="M7 36c0-7 6-11 13-11s13 4 13 11" fill="#ffffff"/></svg>
+            </button>
+            <button type="button" class="btn-preset-avatar" data-preset="4" title="Avatar Pedagógico (Laranja)">
+              <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#EA580C"/><circle cx="20" cy="15" r="7" fill="#ffffff"/><path d="M7 36c0-7 6-11 13-11s13 4 13 11" fill="#ffffff"/></svg>
+            </button>
+            <button type="button" class="btn-preset-avatar" data-preset="5" title="Avatar Escola NG (Bordô)">
+              <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#BE123C"/><circle cx="20" cy="15" r="7" fill="#ffffff"/><path d="M7 36c0-7 6-11 13-11s13 4 13 11" fill="#ffffff"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <hr class="perfil-divisor">
+
+      <!-- Seção: Identificação do Usuário -->
+      <div class="perfil-form-grid">
+        <div>
+          <label for="perfilNomeInput">Seu Nome de Exibição <span style="color:var(--aten)">*</span></label>
+          <input type="text" id="perfilNomeInput" placeholder="Ex: Vanessa Prado" autocomplete="name" required>
+        </div>
+        <div>
+          <label for="perfilEmailInput">E-mail Cadastrado</label>
+          <input type="text" id="perfilEmailInput" readonly class="input-bloqueado" title="E-mail de login vinculado à conta">
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem .75rem;background:#F8FAFC;border:1px solid var(--linha2);border-radius:6px">
+        <span style="font-size:.78rem;color:var(--tinta2);font-weight:500">Perfil de Acesso (Cargo):</span>
+        <span class="tag ok" id="perfilPapelTag">SECRETARIA</span>
+      </div>
+
+      <hr class="perfil-divisor">
+
+      <!-- Seção: Trocar Senha -->
+      <div class="perfil-secao-senha">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+          <div>
+            <h4 style="margin:0;font-size:.85rem;color:var(--tinta);font-weight:600">Trocar Senha de Acesso</h4>
+            <span style="font-size:.72rem;color:var(--tinta2)">Preencha somente se desejar alterar sua senha atual</span>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:.6rem">
+          <div>
+            <label for="perfilSenhaAtual">Senha Atual</label>
+            <input type="password" id="perfilSenhaAtual" placeholder="Digite sua senha atual" autocomplete="current-password">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem">
+            <div>
+              <label for="perfilNovaSenha">Nova Senha</label>
+              <input type="password" id="perfilNovaSenha" placeholder="Mínimo 6 dígitos" autocomplete="new-password">
+            </div>
+            <div>
+              <label for="perfilConfirmaSenha">Confirmar Nova Senha</label>
+              <input type="password" id="perfilConfirmaSenha" placeholder="Repita a nova senha" autocomplete="new-password">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alerta de feedback (sucesso/erro) -->
+      <div id="perfilMsgAlerta" class="alerta-perfil oculto"></div>
+    </div>
+
+    <!-- Rodapé com Botões -->
+    <div class="janela-perfil-footer">
+      <button type="button" id="btnPerfilSair" class="btn-perfil-sair" title="Encerrar sessão no sistema">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        Sair da Plataforma
+      </button>
+      
+      <div style="display:flex;gap:.5rem;align-items:center">
+        <button type="button" class="mini sec" id="btnFecharPerfil">Cancelar</button>
+        <button type="button" class="mini" id="btnSalvarPerfil" style="background:var(--marca);color:#fff;border-color:var(--marca);font-weight:600">
+          Salvar Alterações
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const brl = (n) => (n ?? 0).toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function validaCPF(v){
+  const d = String(v||'').replace(/\D/g,'');
+  if (d.length !== 11 || /^(\d)\1{10}$/.test(d)) return false;
+  const calc = (fim) => { let s=0; for(let i=0;i<fim;i++) s += Number(d[i])*(fim+1-i); const r=(s*10)%11; return r===10?0:r; };
+  return calc(9)===Number(d[9]) && calc(10)===Number(d[10]);
+}
+const emailOk = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(e||''));
+
+/* O veredito vem SEMPRE do servidor. A checagem local de pendências abaixo é só conforto
+   de digitação — o servidor revalida tudo e ignora qualquer perfil enviado pelo navegador. */
+async function api(caminho, corpo){
+  const r = await fetch(caminho, corpo === undefined ? {} : {
+    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(corpo) });
+  if (r.status === 401) { location.href = '/login'; return null; }
+  return r.json();
+}
+
+const CANAIS = [
+  ['SITE','Site institucional','novageracaoitu.com.br'],
+  ['REDES_SOCIAIS','Redes sociais','Instagram e Facebook da escola'],
+  ['ALBUM_TURMA','Álbum compartilhado da turma','Fotos em que aparecem outras crianças'],
+  ['USO_PEDAGOGICO_INTERNO','Uso pedagógico interno','FOA, portfólio, reunião de pais'],
+  ['MATERIAL_IMPRESSO','Material impresso','Folder, mural, apresentação institucional'],
+];
+const consent = {};
+let autorizados = [];
+
+/* ------------------------ montagem do pedido ------------------------ */
+function pedido(){
+  const mesmo = $('mesmoFin').checked;
+  const ct = { nome:$('ctNome').value, cpf:$('ctCpf').value, email:$('ctEmail').value, telefone:$('ctFone').value };
+  return {
+    anoLetivo:Number($('anoLetivo').value), tipo:$('tipo').value,
+    aluno:{
+      nome:$('alNome').value, nascimento:$('alNasc').value, endereco:$('alEnd').value,
+      bairro:$('alBairro').value, cidade:$('alCidade').value, cep:$('alCep').value,
+      irmaos:$('alIrmaos').value ? [$('alIrmaos').value] : [],
+      restricaoJudicial:$('alRestr').value || undefined,
+      autorizadosRetirada: autorizados.filter(a => a.nome && a.telefone),
+      ficha:{
+        usoContinuoMedicamento:$('sdMed').value==='sim', qualMedicamento:$('sdMedQual').value || undefined,
+        alergico:$('sdAlerg').value==='sim', qualAlergia:$('sdAlergQual').value || undefined,
+        intoleranciaAlimentar:$('sdIntol').value || undefined, convenio:$('sdConv').value || undefined,
+        antitermicoAutorizado:$('sdAnti').value || undefined,
+        prescricaoAnexada:$('sdPresc').value === 'sim',
+        contatoEmergenciaNome:$('sdEmNome').value, contatoEmergenciaFone:$('sdEmFone').value,
+      },
+    },
+    contratante:ct,
+    responsavelFinanceiro: mesmo ? ct : { nome:$('fiNome').value, cpf:$('fiCpf').value,
+      email:$('fiEmail').value, telefone:$('fiFone').value },
+    servicos:{ turma:$('turma').value, periodo:$('periodo').value, alimentacao:$('alimentacao').value,
+      fraldario:$('fraldario').value, horaAdicionalDiasMes:Number($('horaAdic').value||0) },
+    formaPagamentoMatricula:$('forma').value,
+    descontoExcepcionalPct:Number($('descPct').value||0),
+    justificativaDesconto:$('descJust').value || undefined,
+    consentimentos:Object.entries(consent).map(([canal,concedido])=>({ canal, concedido, em:new Date().toISOString(),
+      porCpf:(ct.cpf||'').replace(/\D/g,''), porNome:ct.nome, canalColeta:'REQUERIMENTO' })),
+  };
+}
+
+/* -------------------- campos obrigatórios pendentes -------------------- */
+function pendencias(p){
+  const f = [];
+  const req = (v, rot) => { if (!v || String(v).trim().length < 2) f.push(rot); };
+  req(p.aluno.nome,'Nome do aluno'); req(p.aluno.nascimento,'Data de nascimento');
+  req(p.aluno.endereco,'Endereço'); req(p.aluno.bairro,'Bairro'); req(p.aluno.cep,'CEP');
+  req(p.aluno.ficha.contatoEmergenciaNome,'Contato de emergência — nome');
+  req(p.aluno.ficha.contatoEmergenciaFone,'Contato de emergência — telefone');
+  req(p.contratante.nome,'Contratante — nome');
+  if (!validaCPF(p.contratante.cpf)) f.push('Contratante — CPF válido');
+  if (!emailOk(p.contratante.email)) f.push('Contratante — e-mail');
+  req(p.contratante.telefone,'Contratante — telefone');
+  if (!$('mesmoFin').checked){
+    req(p.responsavelFinanceiro.nome,'Responsável financeiro — nome');
+    if (!validaCPF(p.responsavelFinanceiro.cpf)) f.push('Responsável financeiro — CPF válido');
+    if (!emailOk(p.responsavelFinanceiro.email)) f.push('Responsável financeiro — e-mail');
+  }
+  return f;
+}
+
+/* =========================== INTERFACE =========================== */
+$('canais').innerHTML = CANAIS.map(([id,nome,sub]) => `
+  <div class="canal"><p>${nome}<small>${sub}</small></p>
+    <div class="dupla" data-canal="${id}">
+      <button type="button" data-v="sim" aria-pressed="false">Autorizo</button>
+      <button type="button" data-v="nao" aria-pressed="false">Não autorizo</button>
+    </div></div>`).join('');
+
+document.querySelectorAll('.dupla').forEach((d) => {
+  d.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    consent[d.dataset.canal] = b.dataset.v === 'sim';
+    d.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    simular();
+  });
+});
+
+function renderAut(){
+  $('listaAut').innerHTML = autorizados.map((a,i) => `
+    <div class="item-din">
+      <input placeholder="Nome completo" value="${esc(a.nome)}" data-i="${i}" data-c="nome">
+      <input placeholder="Telefone" value="${esc(a.telefone)}" data-i="${i}" data-c="telefone">
+      <input placeholder="Vínculo" value="${esc(a.vinculo)}" data-i="${i}" data-c="vinculo">
+      <button class="rm" data-rm="${i}">×</button>
+    </div>`).join('');
+  $('listaAut').querySelectorAll('input').forEach(el => el.addEventListener('input', (e) => {
+    autorizados[e.target.dataset.i][e.target.dataset.c] = e.target.value; simular();
+  }));
+  $('listaAut').querySelectorAll('.rm').forEach(el => el.addEventListener('click', (e) => {
+    autorizados.splice(Number(e.target.dataset.rm),1); renderAut(); simular();
+  }));
+  $('dicaAut').classList.toggle('oculto', autorizados.length > 0);
+}
+$('btnAddAut').addEventListener('click', () => {
+  autorizados.push({nome:'',telefone:'',vinculo:''}); renderAut();
+});
+
+$('mesmoFin').addEventListener('change', (e) => {
+  $('blocoFin').classList.toggle('oculto', e.target.checked); simular();
+});
+
+const REGRAS_ORDEM = ['R-07','R-08','R-01','R-02','R-03','R-04','R-05','R-06','R-09','R-10','R-11','R-12'];
+
+function pinta(r, pend){
+  if (pend && pend.length){
+    $('regras').innerHTML = REGRAS_ORDEM.map(() =>
+      `<div class="regra"><i class="mk z">·</i><div><b style="color:#98A5B2">aguardando dados</b></div></div>`).join('');
+    $('preco').classList.add('oculto'); $('preco').innerHTML = ''; $('btnEmitir').disabled = true; $('hashLogico').textContent = '';
+    $('decisao').className = 'decisao inc';
+    $('decisao').innerHTML = `INCOMPLETO<small>${pend.length} campo(s) antes do motor decidir.</small>`;
+    $('motivo').innerHTML = pend.slice(0,7).map(p => '• ' + p).join('<br>');
+    return;
+  }
+  const ord = REGRAS_ORDEM.map(id => r.vereditos.find(v => v.regra === id)).filter(Boolean);
+  $('regras').innerHTML = ord.map(v => {
+    const cls = v.conforme ? 's' : v.severidade === 'BLOQUEIA' ? 'n' : 'ed';
+    const txt = v.conforme ? 'S' : v.severidade === 'BLOQUEIA' ? 'N' : 'ED';
+    return `<div class="regra"><i class="mk ${cls}">${txt}</i><div>
+      <b>${v.titulo}</b>${v.conforme ? '' : `<em>${esc(v.detalhe)}</em>`}
+      <span class="ref">${v.regra}${v.achado ? ' · achado ' + v.achado : ''}${v.dono ? ' · decide ' + v.dono.toLowerCase() : ''}</span>
+    </div></div>`;
+  }).join('');
+
+  if (r.decisao === 'LIBERADO'){
+    const c = r.calculo, m = c.mensal;
+    $('decisao').className = 'decisao ok';
+    $('decisao').innerHTML = 'LIBERADO<small>As 12 regras conformes. Documentos podem ser gerados.</small>';
+    $('preco').classList.remove('oculto');
+    $('preco').innerHTML = `
+      <div class="li"><span>Serviço educacional</span><span>${brl(m.servicoEducacional)}</span></div>
+      ${m.alimentacao?`<div class="li"><span>Alimentação</span><span>${brl(m.alimentacao)}</span></div>`:''}
+      ${m.fraldario?`<div class="li"><span>Fraldário</span><span>${brl(m.fraldario)}</span></div>`:''}
+      ${m.horaAdicional?`<div class="li"><span>Time Care</span><span>${brl(m.horaAdicional)}</span></div>`:''}
+      ${m.descontoExcepcional?`<div class="li desc"><span>Desconto excepcional</span><span>− ${brl(m.descontoExcepcional)}</span></div>`:''}
+      <div class="li total"><span>Mensalidade</span><span>${brl(m.totalCheio)}</span></div>
+      <div class="li desc"><span>Pontualidade até o dia 05</span><span>− ${brl(m.descontoPontualidade)}</span></div>
+      <div class="li total"><span>A pagar com pontualidade</span><span>${brl(m.totalComPontualidade)}</span></div>
+      <div class="li" style="margin-top:.5rem"><span>Anuidade derivada</span><span>${brl(c.anuidade)}</span></div>
+      <div class="li"><span>Matrícula · ${c.matricula.pct}% em ${c.matricula.parcelas}×</span><span>${brl(c.matricula.valorParcela)}</span></div>`;
+    $('btnEmitir').disabled = false; $('motivo').textContent = '';
+  } else {
+    $('decisao').className = 'decisao no';
+    $('decisao').innerHTML = `BLOQUEADO<small>${r.bloqueios.length} regra(s) impedem a emissão.</small>`;
+    $('preco').classList.add('oculto'); $('preco').innerHTML = ''; $('btnEmitir').disabled = true;
+    $('motivo').innerHTML = r.bloqueios.map(b => `<b>${b.regra}</b> — ${esc(b.detalhe)}`).join('<br><br>');
+  }
+}
+
+let pedidoSeq = 0;
+async function simular(){
+  const p = pedido(), pend = pendencias(p);
+  if (pend.length) return pinta(null, pend);
+  const seq = ++pedidoSeq;
+  const r = await api('/api/simular', p);
+  if (seq !== pedidoSeq || !r) return;                  // resposta antiga: descarta
+  if (r.decisao === 'INCOMPLETO') return pinta(null, r.pendencias);
+  pinta(r, null);
+  $('hashLogico').textContent = (r.assinaturaLogica || '').slice(0,10);
+}
+
+
+/* ============================ EMISSÃO ============================ */
+$('btnEmitir').addEventListener('click', async () => {
+  const b = $('btnEmitir'); b.disabled = true; b.textContent = 'Gerando documentos…';
+  try {
+    const r = await api('/api/emitir', pedido());
+    if (!r) return;
+    if (!r.ok) {
+      if (r.falhaEnvio) $('motivo').innerHTML = `Documentos gerados (${esc(r.matriculaId)}), mas o envio para assinatura falhou. Tente reenviar.`;
+      return simular();
+    }
+    $('resId').textContent = `${r.matriculaId} · veredito ${r.assinaturaLogica.slice(0,16)}…`;
+    $('resDocs').innerHTML = r.documentos.map(d => `
+      <div class="doc"><div>${d.tipo === 'CONTRATO' ? 'Contrato de prestação de serviços' : 'Requerimento de matrícula'}
+        <span class="hash">sha256 ${esc(d.sha256.slice(0,40))}…</span></div>
+        <a class="abrir" href="/api/documentos/${esc(d.id)}" target="_blank" rel="noopener">abrir PDF</a></div>`).join('');
+    $('resEnv').textContent = `${r.envelope.id} · ${r.envelope.status} · ${r.envelope.modo}`;
+    $('resAss').innerHTML = r.signatarios.map(s =>
+      `<div class="assinante"><span class="ord">${s.ordem}</span><span>${esc(s.nome)}</span><span class="papel">${s.papel}</span></div>`).join('');
+    const t = await api(`/api/matriculas/${encodeURIComponent(r.matriculaId)}/trilha`);
+    if (t) $('resTrilha').innerHTML = `integridade <b>${t.integridade.integra ? 'ÍNTEGRA' : 'ROMPIDA no #'+t.integridade.rompeuEm}</b> · ${t.eventos.length} eventos desta matrícula<br>` +
+      t.eventos.map(e => `${String(e.seq).padStart(3,'0')} <b>${esc(e.tipo)}</b> ${esc(e.hash.slice(0,10))}`).join('<br>');
+    $('resultado').classList.remove('oculto');
+    $('resultado').scrollIntoView({behavior:'smooth', block:'nearest'});
+  } finally {
+    b.textContent = 'Gerar documentos e enviar para assinatura'; b.disabled = false;
+  }
+});
+
+/* ============================ SESSÃO E AMBIENTE ============================ */
+$('btnSair').addEventListener('click', async () => { await api('/api/logout', {}); location.href = '/login'; });
+
+async function carregaConfig(){
+  const c = await api('/api/config'); if (!c) return;
+  $('quemNome').textContent = c.usuario.nome; $('quemPapel').textContent = c.usuario.papel.toLowerCase();
+  $('opNome').value = c.usuario.nome; $('opPapel').value = c.usuario.papel.toLowerCase();
+  const tag = (txt, cls) => `<span class="tag ${cls}">${esc(txt)}</span>`;
+  $('tags').innerHTML = [
+    tag(`ano letivo ${c.anoLetivo}`, ''),
+    tag(c.ambiente, c.ambiente === 'producao' ? 'ok' : 'aten'),
+    tag(c.tabelaAprovadaPor ? 'tabela aprovada' : 'tabela não aprovada', c.tabelaAprovadaPor ? 'ok' : 'aten'),
+    tag(`${c.testemunhas} testemunha(s)`, c.testemunhas === 2 ? 'ok' : 'aten'),
+    tag(c.dpaAssinado ? 'dpa assinado' : 'dpa pendente', c.dpaAssinado ? 'ok' : 'aten'),
+    tag(`assinatura ${c.modoAssinatura.toLowerCase()}`, c.modoAssinatura === 'DOCUSIGN' ? 'ok' : 'aten'),
+  ].join('');
+  // exemplo preenchido só existe fora de produção
+  if (c.ambiente === 'producao') $('btnExemplo').remove();
+
+  // Sincroniza rodapé da sidebar e configurações
+  usuarioSessao = c.usuario;
+  if ($('sidebarNome')) $('sidebarNome').textContent = c.usuario.nome;
+  if ($('sidebarPapel')) $('sidebarPapel').textContent = c.usuario.papel;
+  sincronizarAvatar(c.usuario);
+  if ($('confAmbiente')) $('confAmbiente').textContent = c.ambiente;
+  if ($('confAprovada')) $('confAprovada').textContent = c.tabelaAprovadaPor ? `${c.tabelaAprovadaPor} (Direção)` : 'Pendente de aprovação';
+  if ($('confDocusign')) $('confDocusign').textContent = c.modoAssinatura;
+  if ($('confDpa')) $('confDpa').textContent = c.dpaAssinado ? 'Assinado formalmente' : 'Pendente (homologação)';
+}
+
+/* ==================== ARQUITETURA SIDEBAR POPUP & SEÇÕES ==================== */
+const ALUNOS_BASE = [
+  { id: '869', nome: 'Alice Soares Prieto', ra: '—', turma: 'ALFA I - A', mae: 'Érica Cristina Soares da Silva Prieto', cpf: '278.016.548-03', irmao: null },
+  { id: '926', nome: 'Antonella Chimini', ra: '—', turma: 'ALFA I - A', mae: 'Deborah Tayane da Silva Chimini', cpf: '501.462.138-40', irmao: null },
+  { id: '741', nome: 'Clara Lunardon Salgado', ra: '000122921072-6', turma: 'ALFA I - A', mae: 'Bruna Lunardon Ferreira', cpf: '409.541.418-90', irmao: null },
+  { id: '858', nome: 'Felipe dos Santos Cassiano', ra: '000124665034-4', turma: 'ALFA I - A', mae: 'Pendente de cadastro', cpf: '—', irmao: null },
+  { id: '785', nome: 'Luisa de Lucca Boff', ra: '000123672915-8', turma: 'ALFA I - A', mae: 'Priscila Alencar de Lucca Boff', cpf: '388.357.448-14', irmao: null },
+  { id: '867', nome: 'Maria Alice Witt Andrade', ra: '—', turma: 'ALFA I - A', mae: 'Thais Witt Acosta Andrade', cpf: '102.937.696-48', irmao: 'Vicente Witt (Jardim A)' },
+  { id: '835', nome: 'Maria Rita Sampaio Faria', ra: '000124238933-7', turma: 'ALFA I - A', mae: 'Rita Karina Nobre Sampaio', cpf: '315.043.388-63', irmao: null },
+  { id: '772', nome: 'Noah Borges de Paula', ra: '000123351033-2', turma: 'ALFA I - A', mae: 'Letícia Borges de Paula', cpf: '480.834.338-02', irmao: null },
+  { id: '913', nome: 'Maria Elisa Mandetta Accarini', ra: '13304354', turma: 'ALFA I - A', mae: 'Karen Mandetta Accarini', cpf: '373.308.398-92', irmao: null },
+  { id: '771', nome: 'Izzie Jardim Zenni', ra: '000123350908-1', turma: 'ALFA I - A', mae: 'Fernanda Cristina Jardim', cpf: '418.993.668-57', irmao: 'Matteo Jardim Zenni (Mini-Maternal A)' },
+  { id: '946', nome: 'Sarah de Almeida', ra: '000124613894-3', turma: 'ALFA I - A', mae: 'Érika Maria Oliveira de Almeida', cpf: '399.307.998-18', irmao: 'Davi de Almeida (Berçário I A)' },
+  { id: '981', nome: 'Mirelly Maximino dos Santos', ra: '—', turma: 'ALFA I - A', mae: 'Marcela Maximino Araujo', cpf: '570.785.918-79', irmao: null },
+  { id: '945', nome: 'Davi de Almeida', ra: '000126124193-9', turma: 'BERCARIO I - A', mae: 'Érika Maria Oliveira de Almeida', cpf: '399.307.998-18', irmao: 'Sarah de Almeida (Alfa I A)' },
+  { id: '954', nome: 'Liz Borges Rodrigues', ra: '000126314249-7', turma: 'BERCARIO I - A', mae: 'Heloisa Borges dos Santos', cpf: '490.464.238-40', irmao: null },
+  { id: '952', nome: 'Cecilia Gomes Luiz', ra: '000126314227-8', turma: 'BERCARIO I - A', mae: 'Bruna Fernanda Gomes Luiz', cpf: '415.224.168-38', irmao: null },
+  { id: '940', nome: 'Francisco da Silva de Almeida Massoca', ra: '000126105021-6', turma: 'BERCARIO I - A', mae: 'Francielle Linelza da Silva de Almeida', cpf: '378.003.938-95', irmao: null },
+  { id: '973', nome: 'Maya Vitória Pinheiro Rocha', ra: '000126468940-8', turma: 'BERCARIO I - A', mae: 'Stephanie Pinheiro Rocha', cpf: '414.366.688-08', irmao: null },
+  { id: '979', nome: 'Matteo Santos Camilotti', ra: '000126590117-X', turma: 'BERCARIO I - A', mae: 'Cleopatra Santos Camilotti', cpf: '399.486.878-50', irmao: null },
+  { id: '531', nome: 'Lucca Fontoura Berni', ra: '000126314182-1', turma: 'BERCARIO I - B', mae: 'Nathalia Fontoura Berni', cpf: '349.225.058-06', irmao: null },
+  { id: '924', nome: 'Theo Carvalho Sorio', ra: '000125947956-0', turma: 'MINI - MATERNAL - B', mae: 'Fabiana Yoshinaga Tonholo Guardia', cpf: '389.054.828-80', irmao: null },
+  { id: '948', nome: 'Antonio Yoshinaga Guardia', ra: '000126314081-6', turma: 'BERCARIO I - B', mae: 'Fabiana Yoshinaga Tonholo Guardia', cpf: '389.054.828-80', irmao: null },
+  { id: '968', nome: 'Cecília Cruz de Camargo', ra: '—', turma: 'BERCARIO I - B', mae: 'Thauane Stefane Santos da Cruz', cpf: '363.428.818-39', irmao: null },
+  { id: '978', nome: 'Levi Ramos Ricci', ra: '—', turma: 'BERCARIO I - B', mae: 'Amanda Ramos Ricci', cpf: '446.273.168-95', irmao: null },
+  { id: '915', nome: 'Alice Silva Costa', ra: '000125677057-7', turma: 'MINI - MATERNAL - A', mae: 'Camila Silva Costa', cpf: '471.832.948-54', irmao: 'Valentina Silva Costa (Maternal A)' },
+  { id: '937', nome: 'Lorena Capelli', ra: '000126075355-4', turma: 'MINI - MATERNAL - A', mae: 'Francielle Scarso Capelli', cpf: '484.959.288-09', irmao: null },
+  { id: '897', nome: 'Lorena de Oliveira Sena', ra: '000125647669-9', turma: 'MINI - MATERNAL - A', mae: 'Ana Claudia de Oliveira', cpf: '—', irmao: null },
+  { id: '911', nome: 'Matteo Jardim Zenni', ra: '000125647668-7', turma: 'MINI - MATERNAL - A', mae: 'Fernanda Cristina Jardim', cpf: '418.993.668-57', irmao: 'Izzie Jardim Zenni (Alfa I A)' },
+  { id: '951', nome: 'Matteo de Arruda Bregagnolo', ra: '000126313579-1', turma: 'MINI - MATERNAL - A', mae: 'Marina Gimenez Arruda de Oliveira', cpf: '351.922.518-26', irmao: null },
+  { id: '925', nome: 'Oliver Martins Spagnol', ra: '—', turma: 'MINI - MATERNAL - A', mae: 'Oswaldo Martins Junior (Pai)', cpf: '391.702.598-10', irmao: null },
+  { id: '927', nome: 'Theo Nunes Savi', ra: '000126070420-8', turma: 'MINI - MATERNAL - A', mae: 'Anna Júlia Nunes Savi', cpf: '474.601.748-40', irmao: null },
+  { id: '961', nome: 'Alice Pereira Salton', ra: '—', turma: 'MATERNAL - A', mae: 'Bruna Aparecida Pereira Salton', cpf: '388.015.798-70', irmao: 'Bruno Pereira Salton (Maternal A)' },
+  { id: '960', nome: 'Bruno Pereira Salton', ra: '—', turma: 'MATERNAL - A', mae: 'Bruna Aparecida Pereira Salton', cpf: '388.015.798-70', irmao: 'Alice Pereira Salton (Maternal A)' },
+  { id: '928', nome: 'Arthur Camara Dias', ra: '000126063549-1', turma: 'MATERNAL - A', mae: 'Larissa da Silveira Câmara', cpf: '388.015.798-70', irmao: null },
+  { id: '912', nome: 'Bernardo Bortolazo Maciel', ra: '000125655193-4', turma: 'MATERNAL - A', mae: 'Karina Bortolazo Maciel', cpf: '385.606.128-23', irmao: null },
+  { id: '931', nome: 'Davi Stein', ra: '000126063423-1', turma: 'MATERNAL - A', mae: 'Tuila Pamela de Oliveira', cpf: '412.383.278-42', irmao: null },
+  { id: '933', nome: 'Gabriel Alves de Oliveira Matos Rebesco', ra: '000126063212-X', turma: 'MATERNAL - A', mae: 'Priscila Rebesco Alves de Oliveira Matos', cpf: '415.523.768-77', irmao: 'Samuel Alves (Gêmeo/Maternal)' },
+  { id: '932', nome: 'Samuel Alves de Oliveira Matos Rebesco', ra: '000126063267-2', turma: 'MATERNAL - A', mae: 'Priscila Rebesco Alves de Oliveira Matos', cpf: '415.523.768-77', irmao: 'Gabriel Alves (Gêmeo/Maternal)' },
+  { id: '896', nome: 'Theo Rangel de Oliveira', ra: '000125655306-2', turma: 'MATERNAL - A', mae: 'Fernanda Rangel de Oliveira', cpf: '458.168.698-92', irmao: 'Pedro Rangel (Alfa II A)' },
+  { id: '825', nome: 'Pedro Rangel de Oliveira', ra: '122392492', turma: 'ALFA II - A', mae: 'Fernanda Rangel de Oliveira', cpf: '458.168.698-92', irmao: 'Theo Rangel (Maternal A)' },
+  { id: '878', nome: 'Valentina Silva Costa', ra: '000125000091-9', turma: 'MATERNAL - A', mae: 'Camila Silva Costa', cpf: '471.832.948-54', irmao: 'Alice Silva Costa (Mini-Maternal A)' },
+  { id: '861', nome: 'Valentim Barroso Arruda', ra: '000124771554-1', turma: 'JARDIM - B - (TARDE)', mae: 'Caroline Oliva Barroso Mourão', cpf: '409.364.238-97', irmao: 'Antonio Miguel (Alfa II B)' },
+  { id: '821', nome: 'Antonio Miguel Barroso Arruda', ra: '—', turma: 'ALFA II - B', mae: 'Caroline Oliva Barroso Mourão', cpf: '409.364.238-97', irmao: 'Valentim Barroso (Jardim B)' },
+  { id: '899', nome: 'Liz Ikeda Nicolett', ra: '000125644569-1', turma: 'JARDIM - A - (MANHA)', mae: 'Paula Chagas Ikeda Nicolett', cpf: '090.210.496-94', irmao: 'Luca Ikeda (Alfa II A)' },
+  { id: '824', nome: 'Luca Ikeda Nicollett', ra: '000124238288-4', turma: 'ALFA II - A', mae: 'Paula Chagas Ikeda Nicolett', cpf: '090.210.496-94', irmao: 'Liz Ikeda (Jardim A)' },
+  { id: '898', nome: 'Vicente Witt de Andrade', ra: '000125644574-5', turma: 'JARDIM - A - (MANHA)', mae: 'Thais Witt Acosta Andrade', cpf: '102.937.696-48', irmao: 'Maria Alice Witt (Alfa I A)' },
+  { id: '872', nome: 'Gabriel Claro Drugovich', ra: '000124986695-9', turma: 'ALFA I - B - (TARDE)', mae: 'Ana Carolina de Moraes Claro Drugovich', cpf: '363.679.028-56', irmao: 'Olivia Claro (Alfa I B)' },
+  { id: '871', nome: 'Olivia Claro Drugovich', ra: '000124986715-0', turma: 'ALFA I - B - (TARDE)', mae: 'Ana Carolina de Moraes Claro Drugovich', cpf: '363.679.028-56', irmao: 'Gabriel Claro (Alfa I B)' },
+  { id: '813', nome: 'Rafael Euzebio Passos', ra: '000124239186-1', turma: 'ALFA I - B - (TARDE)', mae: 'Ana Flávia Euzebio Machado', cpf: '038.360.361-77', irmao: 'Daniel Euzebio (Alfa II B)' },
+  { id: '744', nome: 'Daniel Euzebio Passos', ra: '000123353736-2', turma: 'ALFA II - B', mae: 'Ana Flávia Euzebio Machado', cpf: '038.360.361-77', irmao: 'Rafael Euzebio (Alfa I B)' }
+];
+
+function alternarMenu(forcar) {
+  const side = $('sidebarApp');
+  const drop = $('sidebarBackdrop');
+  if (!side || !drop) return;
+  const expande = typeof forcar === 'boolean' ? forcar : !side.classList.contains('expandido');
+  side.classList.toggle('expandido', expande);
+  drop.classList.toggle('visivel', expande);
+}
+
+function mudarSecao(idSecao) {
+  document.querySelectorAll('.secao-view').forEach(s => s.classList.add('oculto'));
+  const ativa = $(idSecao);
+  if (ativa) ativa.classList.remove('oculto');
+
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.classList.toggle('ativo', link.dataset.secao === idSecao);
+  });
+
+  alternarMenu(false);
+  window.location.hash = idSecao.replace('view-', '');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+$('btnSidebarToggle')?.addEventListener('click', () => alternarMenu());
+$('btnSidebarFechar')?.addEventListener('click', () => alternarMenu(false));
+$('sidebarBackdrop')?.addEventListener('click', () => alternarMenu(false));
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') alternarMenu(false);
+});
+
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    mudarSecao(link.dataset.secao);
+  });
+});
+
+function renderAlunos(lista) {
+  const corpo = $('corpoTabelaAlunos');
+  if (!corpo) return;
+  corpo.innerHTML = lista.map(a => `
+    <tr>
+      <td style="font-family:'IBM Plex Mono',monospace;color:var(--tinta2);font-weight:600">${esc(a.id)}</td>
+      <td><b>${esc(a.nome)}</b></td>
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:.74rem">${esc(a.ra)}</td>
+      <td><span class="badge-tag">${esc(a.turma)}</span></td>
+      <td>${esc(a.mae)}</td>
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:.74rem">${esc(a.cpf)}</td>
+      <td>${a.irmao ? `<span class="badge-tag irmaos">👨‍👩‍👧 ${esc(a.irmao)}</span>` : '<span style="color:#A0AEC0;font-size:.72rem">—</span>'}</td>
+      <td style="text-align:right;white-space:nowrap">
+        <button class="mini" onclick="iniciarMatriculaAluno('${esc(a.nome).replace(/'/g,"\\'")}','${esc(a.turma)}','${esc(a.mae).replace(/'/g,"\\'")}','${esc(a.cpf)}','${esc(a.irmao || '').replace(/'/g,"\\'")}')">Emitir Matrícula</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+window.iniciarMatriculaAluno = function(nome, turmaTxt, respNome, respCpf, irmaoTxt) {
+  mudarSecao('view-documentacao');
+  $('alNome').value = nome;
+  if (respNome && !respNome.includes('Pendente')) $('ctNome').value = respNome;
+  if (respCpf && respCpf !== '—') $('ctCpf').value = respCpf;
+  if (irmaoTxt) $('alIrmaos').value = irmaoTxt;
+  let turmaVal = 'ALFA_I';
+  if (turmaTxt.includes('BERCARIO')) turmaVal = 'BERCARIO';
+  else if (turmaTxt.includes('MINI')) turmaVal = 'MINI_MATERNAL';
+  else if (turmaTxt.includes('MATERNAL')) turmaVal = 'MATERNAL';
+  else if (turmaTxt.includes('JARDIM')) turmaVal = 'JARDIM';
+  else if (turmaTxt.includes('ALFA II') || turmaTxt.includes('ALFA_II')) turmaVal = 'ALFA_II';
+  $('turma').value = turmaVal;
+  simular();
+};
+
+function filtrarAlunos() {
+  const q = ($('buscaAluno')?.value || '').toLowerCase().trim();
+  const t = ($('filtroTurmaAluno')?.value || '').toLowerCase();
+  const f = $('filtroIrmaosAluno')?.value || '';
+  const filtrados = ALUNOS_BASE.filter(a => {
+    const matchQ = !q || a.nome.toLowerCase().includes(q) || a.mae.toLowerCase().includes(q) || a.cpf.includes(q) || a.ra.includes(q);
+    const matchT = !t || a.turma.toLowerCase().includes(t);
+    const matchF = !f || (f === 'irmaos' && a.irmao) || (f === 'sem_ra' && (!a.ra || a.ra === '—'));
+    return matchQ && matchT && matchF;
+  });
+  renderAlunos(filtrados);
+}
+
+$('buscaAluno')?.addEventListener('input', filtrarAlunos);
+$('filtroTurmaAluno')?.addEventListener('change', filtrarAlunos);
+$('filtroIrmaosAluno')?.addEventListener('change', filtrarAlunos);
+renderAlunos(ALUNOS_BASE);
+
+// Sincroniza hash na inicialização
+window.addEventListener('load', () => {
+  const h = window.location.hash.replace('#', '');
+  if (['dashboard', 'alunos', 'documentacao', 'configuracoes'].includes(h)) {
+    mudarSecao(`view-${h}`);
+  }
+});
+
+/* ==================== GESTÃO DE PERFIL, FOTO E SEGURANÇA ==================== */
+let usuarioSessao = null;
+let fotoPerfilTemporaria = null;
+
+function obterFotoSalva(email) {
+  try {
+    return localStorage.getItem('ng_user_photo_' + (email || 'padrao'));
+  } catch(e) { return null; }
+}
+
+function salvarFotoLocal(email, dataUrl) {
+  try {
+    if (dataUrl) localStorage.setItem('ng_user_photo_' + (email || 'padrao'), dataUrl);
+    else localStorage.removeItem('ng_user_photo_' + (email || 'padrao'));
+  } catch(e) {}
+}
+
+function sincronizarAvatar(usuario, fotoDataUrl) {
+  const email = usuario?.email || 'padrao';
+  const foto = fotoDataUrl !== undefined ? fotoDataUrl : obterFotoSalva(email);
+  const nome = usuario?.nome || $('sidebarNome')?.textContent || 'NG';
+  const iniciais = nome.trim().split(/\s+/).map(p => p[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || 'NG';
+
+  const avatarSide = $('sidebarAvatar');
+  const previewModal = $('perfilAvatarPreview');
+  const btnRemover = $('btnRemoverFoto');
+
+  if (foto) {
+    if (avatarSide) avatarSide.innerHTML = `<img src="${foto}" class="avatar-img-foto" alt="${esc(nome)}">`;
+    if (previewModal) previewModal.innerHTML = `<img src="${foto}" class="avatar-img-foto" alt="${esc(nome)}">`;
+    if (btnRemover) btnRemover.style.display = 'inline-block';
+  } else {
+    if (avatarSide) { avatarSide.innerHTML = ''; avatarSide.textContent = iniciais; }
+    if (previewModal) previewModal.innerHTML = `<span id="perfilAvatarTexto">${esc(iniciais)}</span>`;
+    if (btnRemover) btnRemover.style.display = 'none';
+  }
+}
+
+function mostrarAlertaPerfil(msg, sucesso) {
+  const el = $('perfilMsgAlerta');
+  if (!el) return;
+  el.className = `alerta-perfil ${sucesso ? 'sucesso' : 'erro'}`;
+  el.textContent = msg;
+  el.classList.remove('oculto');
+}
+
+function abrirModalPerfil() {
+  if (!usuarioSessao) return;
+  $('perfilNomeInput').value = usuarioSessao.nome || '';
+  $('perfilEmailInput').value = usuarioSessao.email || '';
+  $('perfilPapelTag').textContent = usuarioSessao.papel || 'SECRETARIA';
+  
+  $('perfilSenhaAtual').value = '';
+  $('perfilNovaSenha').value = '';
+  $('perfilConfirmaSenha').value = '';
+
+  const foto = obterFotoSalva(usuarioSessao.email);
+  fotoPerfilTemporaria = foto;
+  sincronizarAvatar(usuarioSessao, foto);
+
+  const alerta = $('perfilMsgAlerta');
+  alerta.className = 'alerta-perfil oculto';
+  alerta.textContent = '';
+
+  $('modalPerfil').classList.remove('oculto');
+}
+
+function fecharModalPerfil() {
+  $('modalPerfil').classList.add('oculto');
+  if (usuarioSessao) {
+    sincronizarAvatar(usuarioSessao);
+  }
+}
+
+// Triggers para abrir o modal de perfil
+$('sidebarAvatar')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  abrirModalPerfil();
+});
+$('sidebarCardUsuario')?.addEventListener('click', () => {
+  abrirModalPerfil();
+});
+
+// Fechar modal
+$('btnFecharPerfil')?.addEventListener('click', fecharModalPerfil);
+$('btnFecharPerfilX')?.addEventListener('click', fecharModalPerfil);
+$('modalPerfil')?.addEventListener('click', (e) => {
+  if (e.target === $('modalPerfil')) fecharModalPerfil();
+});
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !$('modalPerfil').classList.contains('oculto')) {
+    fecharModalPerfil();
+  }
+});
+
+// Upload de imagem personalizada
+$('btnUploadFoto')?.addEventListener('click', () => $('inputFotoArquivo').click());
+$('btnGatilhoFoto')?.addEventListener('click', () => $('inputFotoArquivo').click());
+
+$('inputFotoArquivo')?.addEventListener('change', (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    mostrarAlertaPerfil('Por favor, selecione uma imagem válida (JPEG, PNG ou WEBP).', false);
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const MAX = 256;
+      let w = img.width, h = img.height;
+      const tam = Math.min(w, h);
+      canvas.width = MAX;
+      canvas.height = MAX;
+      const ctx = canvas.getContext('2d');
+      const sx = (w - tam) / 2;
+      const sy = (h - tam) / 2;
+      ctx.drawImage(img, sx, sy, tam, tam, 0, 0, MAX, MAX);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+      fotoPerfilTemporaria = dataUrl;
+      sincronizarAvatar(usuarioSessao, dataUrl);
+      mostrarAlertaPerfil('Foto selecionada com sucesso! Clique em "Salvar Alterações" para confirmar.', true);
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+// Presets de avatar
+document.querySelectorAll('.btn-preset-avatar').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const svg = btn.querySelector('svg');
+    if (!svg) return;
+    const svgStr = new XMLSerializer().serializeToString(svg);
+    const dataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr);
+    fotoPerfilTemporaria = dataUrl;
+    sincronizarAvatar(usuarioSessao, dataUrl);
+    mostrarAlertaPerfil('Avatar selecionado! Clique em "Salvar Alterações" para confirmar.', true);
+  });
+});
+
+// Remover foto
+$('btnRemoverFoto')?.addEventListener('click', () => {
+  fotoPerfilTemporaria = null;
+  sincronizarAvatar(usuarioSessao, null);
+  mostrarAlertaPerfil('Foto removida. O avatar exibirá suas iniciais ao salvar.', true);
+});
+
+// Salvar perfil
+$('btnSalvarPerfil')?.addEventListener('click', async () => {
+  const nomeNovo = $('perfilNomeInput').value.trim();
+  if (!nomeNovo || nomeNovo.length < 2) {
+    mostrarAlertaPerfil('Informe um nome válido com pelo menos 2 caracteres.', false);
+    return;
+  }
+
+  const btn = $('btnSalvarPerfil');
+  btn.disabled = true;
+  btn.textContent = 'Salvando...';
+
+  try {
+    // 1. Atualizar nome se alterado
+    if (nomeNovo !== usuarioSessao.nome) {
+      const respNome = await fetch('/api/usuario/perfil', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome: nomeNovo })
+      });
+      const dataNome = await respNome.json().catch(() => ({}));
+      if (!respNome.ok) {
+        throw new Error(dataNome.erro || 'Não foi possível atualizar o nome.');
+      }
+      usuarioSessao.nome = nomeNovo;
+      if ($('sidebarNome')) $('sidebarNome').textContent = nomeNovo;
+      if ($('quemNome')) $('quemNome').textContent = nomeNovo;
+      if ($('opNome')) $('opNome').value = nomeNovo;
+    }
+
+    // 2. Trocar senha se campos informados
+    const senhaAtual = $('perfilSenhaAtual').value;
+    const novaSenha = $('perfilNovaSenha').value;
+    const confirmaSenha = $('perfilConfirmaSenha').value;
+
+    if (senhaAtual || novaSenha || confirmaSenha) {
+      if (!senhaAtual) throw new Error('Informe a senha atual para prosseguir.');
+      if (novaSenha.length < 6) throw new Error('A nova senha deve ter no mínimo 6 caracteres.');
+      if (novaSenha !== confirmaSenha) throw new Error('A nova senha e a confirmação não conferem.');
+
+      const respSenha = await fetch('/api/usuario/senha', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ senhaAtual, novaSenha })
+      });
+      const dataSenha = await respSenha.json().catch(() => ({}));
+      if (!respSenha.ok) {
+        throw new Error(dataSenha.erro || 'Senha atual incorreta ou inválida.');
+      }
+      $('perfilSenhaAtual').value = '';
+      $('perfilNovaSenha').value = '';
+      $('perfilConfirmaSenha').value = '';
+    }
+
+    // 3. Persistir foto no localStorage
+    salvarFotoLocal(usuarioSessao.email, fotoPerfilTemporaria);
+    sincronizarAvatar(usuarioSessao, fotoPerfilTemporaria);
+
+    mostrarAlertaPerfil('Perfil atualizado com sucesso!', true);
+    setTimeout(() => {
+      fecharModalPerfil();
+    }, 1100);
+  } catch (err) {
+    mostrarAlertaPerfil(err.message, false);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Salvar Alterações';
+  }
+});
+
+// Sair da plataforma dentro do popup
+$('btnPerfilSair')?.addEventListener('click', async () => {
+  try {
+    await api('/api/logout', {});
+  } finally {
+    location.href = '/login';
+  }
+});
+
+/* =========================== EXEMPLO =========================== */
+$('btnExemplo').addEventListener('click', () => {
+  const v = { alNome:'Helena Braga Fontoura', alNasc:'2021-04-17', alEnd:'Rua Paula Souza, 412',
+    alBairro:'Vila Nova', alCep:'13301-140', alIrmaos:'Miguel, 7 anos',
+    ctNome:'Rodrigo Fontoura Alves', ctCpf:'390.533.447-05',
+    ctEmail:'rodrigo.fontoura@exemplo.com.br', ctFone:'11988776655',
+    sdAlergQual:'Amendoim e castanhas', sdIntol:'Lactose (leve)', sdConv:'Unimed Itu',
+    sdAnti:'Dipirona gotas, conforme receituário anexo',
+    sdEmNome:'Sônia Braga Fontoura (avó)', sdEmFone:'11987654321' };
+  for (const [k,val] of Object.entries(v)) $(k).value = val;
+  $('sdAlerg').value = 'sim'; $('alimentacao').value = 'ALMOCO';
+  autorizados = [{nome:'Sônia Braga Fontoura',telefone:'11987654321',vinculo:'Avó materna'},
+                 {nome:'Marcos Fontoura',telefone:'11991234567',vinculo:'Tio'}];
+  renderAut();
+  CANAIS.forEach(([id]) => {
+    consent[id] = id !== 'REDES_SOCIAIS';
+    const d = document.querySelector(`.dupla[data-canal="${id}"]`);
+    d.querySelectorAll('button').forEach(b =>
+      b.setAttribute('aria-pressed', String((b.dataset.v === 'sim') === consent[id])));
+  });
+  simular();
+});
+
+$('btnLimpar').addEventListener('click', () => {
+  document.querySelectorAll('input[type=text],input:not([type]),input[type=email],input[type=date],input[type=number]')
+    .forEach(el => { if (!['anoLetivo','horaAdic','descPct','alCidade','opNome'].includes(el.id)) el.value=''; });
+  for (const k of Object.keys(consent)) delete consent[k];
+  document.querySelectorAll('.dupla button').forEach(b => b.setAttribute('aria-pressed','false'));
+  autorizados = []; renderAut();
+  $('resultado').classList.add('oculto');
+  simular();
+});
+
+
+/* ============================ BOOT ============================ */
+let espera;
+const agenda = () => { clearTimeout(espera); espera = setTimeout(simular, 280); };
+document.querySelectorAll('input,select').forEach(el => {
+  el.addEventListener('input', agenda); el.addEventListener('change', agenda);
+});
+renderAut(); carregaConfig().then(simular);
+</script>
+</body>
+</html>
