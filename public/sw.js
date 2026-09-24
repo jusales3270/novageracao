@@ -1,5 +1,5 @@
 // Service Worker — Escola Nova Geração PWA
-const CACHE_NAME = 'ng-pwa-v1';
+const CACHE_NAME = 'ng-pwa-v3';
 const RECURSOS_PRECACHE = [
   '/',
   '/login',
@@ -28,8 +28,8 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   const url = new URL(req.url);
 
-  // Não intercepta chamadas de API mutativas ou websockets
-  if (req.method !== 'GET' || url.pathname.startsWith('/api/') || url.pathname.startsWith('/ds/')) {
+  // Não intercepta chamadas de API mutativas, websockets ou balloons.js
+  if (req.method !== 'GET' || url.pathname.startsWith('/api/') || url.pathname.startsWith('/ds/') || url.pathname === '/balloons.js') {
     return;
   }
 

@@ -123,7 +123,7 @@ const servidor = createServer(async (req, res) => {
       const headers: Record<string, string> = {
         ...SEG,
         'Content-Type': ARQUIVOS_PWA[url.pathname]!,
-        'Cache-Control': url.pathname === '/sw.js' ? 'no-cache' : 'public, max-age=86400',
+        'Cache-Control': (url.pathname === '/sw.js' || url.pathname === '/balloons.js') ? 'no-cache, no-store, must-revalidate' : 'public, max-age=86400',
       };
       if (url.pathname === '/sw.js') {
         headers['Service-Worker-Allowed'] = '/';

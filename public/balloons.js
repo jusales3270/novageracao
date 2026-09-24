@@ -164,77 +164,98 @@ typeof SuppressedError === "function" ? SuppressedError : function (error, suppr
     return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
 };
 
+
 // @ts-nocheck
-var defaultBalloonColor = "#84A332";
-var defaultLightColor = "#C0F381";
-var balloonColorProperty = "--balloon-color";
-var lightColorProperty = "--light-color";
-var widthProperty = "--balloon-width";
-var heightProperty = "--balloon-height";
-var balloonDefaultSize = {
-    width: 233,
-    height: 609,
-};
-var createBallonElement = function (_a) {
-    var balloonColor = _a.balloonColor, lightColor = _a.lightColor, width = _a.width;
+var colorPalettes = [
+    { light: "#FFF59D", main: "#F59E0B", dark: "#B45309" }, // Amber / Gold
+    { light: "#FFCDD2", main: "#EF4444", dark: "#B91C1C" }, // Ruby Red
+    { light: "#BAE6FD", main: "#0284C7", dark: "#0369A1" }, // Sky Blue
+    { light: "#BBF7D0", main: "#10B981", dark: "#047857" }, // Emerald Green
+    { light: "#FBCFE8", main: "#EC4899", dark: "#BE185D" }, // Bright Pink
+    { light: "#DDD6FE", main: "#8B5CF6", dark: "#6D28D9" }, // Purple / Violet
+    { light: "#A7F3D0", main: "#14B8A6", dark: "#0F766E" }, // Teal
+    { light: "#FED7AA", main: "#F97316", dark: "#C2410C" }, // Orange
+    { light: "#93C5FD", main: "#2563EB", dark: "#1D4ED8" }, // Nova Geracao Royal Blue
+];
+
+var balloonUid = 0;
+
+var createBallonElement = function (options) {
+    options = options || {};
+    var palette = options.palette || colorPalettes[0];
+    var balloonColor = options.balloonColor || palette.main;
+    var lightColor = options.lightColor || palette.light;
+    var darkColor = options.darkColor || palette.dark;
+    var width = options.width || 100;
+    var height = Math.round((width * 609) / 223);
+    var id = "bl_" + (++balloonUid);
+
     var balloon = document.createElement("balloon");
-    balloon.innerHTML = balloonSvgHTML;
-    Object.assign(balloon.style, {
-        position: "absolute",
-        top: "0",
-        left: "0",
-        display: "block",
-        transformStyle: "preserve-3d",
-        opacity: "1",
-        pointerEvents: "auto",
-        cursor: "pointer",
-        userSelect: "none",
-        webkitUserSelect: "none",
-        touchAction: "manipulation",
-        transformOrigin: "".concat(width / 2, "px ").concat(width / 2, "px"),
-        willChange: "transform",
-    });
-    balloon.style.setProperty(balloonColorProperty, balloonColor);
-    balloon.style.setProperty(lightColorProperty, lightColor);
-    balloon.style.setProperty(widthProperty, width + "px");
-    balloon.style.setProperty(heightProperty, (width * 609) / 223 + "px");
+    balloon.style.width = width + "px";
+    balloon.style.height = height + "px";
+    balloon.style.position = "absolute";
+    balloon.style.top = "0";
+    balloon.style.left = "0";
+    balloon.style.display = "block";
+    balloon.style.transformStyle = "preserve-3d";
+    balloon.style.opacity = "1";
+    balloon.style.pointerEvents = "auto";
+    balloon.style.cursor = "pointer";
+    balloon.style.userSelect = "none";
+    balloon.style.webkitUserSelect = "none";
+    balloon.style.touchAction = "manipulation";
+    balloon.style.transformOrigin = (width / 2) + "px " + (width / 2) + "px";
+    balloon.style.willChange = "transform";
+    balloon.style.setProperty("--balloon-color", balloonColor);
+    balloon.style.setProperty("--light-color", lightColor);
+    balloon.style.filter = "drop-shadow(0 10px 22px rgba(0,0,0,0.18))";
+
+    balloon.innerHTML = `<svg width="${width}" height="${height}" viewBox="0 0 223 609" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:100%;overflow:visible;">
+        <defs>
+            <radialGradient id="${id}_body" cx="36%" cy="26%" r="66%" fx="30%" fy="20%">
+                <stop offset="0%" stop-color="${lightColor}" stop-opacity="0.95" />
+                <stop offset="38%" stop-color="${balloonColor}" stop-opacity="1" />
+                <stop offset="85%" stop-color="${balloonColor}" stop-opacity="0.98" />
+                <stop offset="100%" stop-color="${darkColor}" stop-opacity="0.88" />
+            </radialGradient>
+            <linearGradient id="${id}_str" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8" />
+                <stop offset="50%" stop-color="#94a3b8" stop-opacity="0.55" />
+                <stop offset="100%" stop-color="#ffffff" stop-opacity="0.75" />
+            </linearGradient>
+            <linearGradient id="${id}_shine" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.7" />
+                <stop offset="50%" stop-color="#ffffff" stop-opacity="0.15" />
+                <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+            </linearGradient>
+        </defs>
+        <path d="M117.5 253C136.167 294.5 134.7 395 125.5 453C116.3 511 133.833 578.167 125.5 606" stroke="url(#${id}_str)" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.8"/>
+        <path d="M125 256.5C125 258.433 122.09 260 118.5 260C114.91 260 112 258.433 112 256.5C112 254.567 114.91 255 118.5 255C122.09 255 125 254.567 125 256.5Z" fill="${darkColor}"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M176.876 204.032C181.934 198.064 209.694 160.262 210.899 127.619C213.023 70.1236 176.876 13 118.337 13C55.7949 13 18.5828 69.332 22.2724 127.619C24.0956 156.423 38.9766 178.5 51.7922 195.372C57.7811 203.257 90.0671 238.749 112.15 245.044C111.698 248.246 112.044 253.284 116.338 254H121.838V245.71C143.277 242.292 172.085 209.686 176.876 204.032Z" fill="url(#${id}_body)"/>
+        <path opacity="0.14" d="M178.928 128.12C178.011 152.146 172.137 162.97 154.623 184.2C141.594 199.992 128.28 215 112.805 215C104.349 215 92.739 215 65.2673 177.844C56.1123 165.461 45.4818 149.259 44.1794 128.12C41.5436 85.3424 68.1267 44 112.805 44C154.623 44 180.55 85.6242 178.928 128.12Z" fill="#000000"/>
+        <path d="M72.7992 108.638L74.0985 87.5247C74.3145 84.0152 77.4883 81.4427 80.9664 81.958L94.8619 84.0166C98.4018 84.541 100.699 88.0277 99.7828 91.4871L94.0502 113.144C93.1964 116.369 89.8758 118.278 86.659 117.394L77.1969 114.792C74.4599 114.039 72.6249 111.471 72.7992 108.638Z" fill="url(#${id}_shine)" opacity="0.9"/>
+        <path d="M147.76 88.7366L144.842 67.9855C144.378 64.687 141.316 62.3976 138.021 62.8858L123.638 65.0166C120.098 65.541 117.801 69.0277 118.717 72.4871L124.462 94.1891C125.311 97.3967 128.602 99.3061 131.808 98.4512L143.364 95.3695C146.296 94.5878 148.182 91.7409 147.76 88.7366Z" fill="#ffffff" opacity="0.32"/>
+        <path d="M46.4087 131.164C38.1642 111.726 43.2454 91.2599 47.4381 82.0988C47.7504 81.4164 48.5574 80.8601 48.8712 81.5418C48.9711 81.7589 48.9188 82.1169 48.8357 82.3409C41.2341 102.832 45.5154 122.958 47.3397 130.925C47.8434 133.124 47.2898 133.242 46.4087 131.164Z" fill="#ffffff" opacity="0.55"/>
+        <path d="M190.817 150.078C196.906 136.754 196.503 119.258 195.396 111.05C195.318 110.475 194.888 109.925 194.734 110.403C194.704 110.495 194.689 110.697 194.699 110.807C196.396 129.344 191.942 144.593 190.447 149.824C190.122 150.959 190.349 151.104 190.817 150.078Z" fill="#ffffff" opacity="0.35"/>
+    </svg>`;
+
     return balloon;
 };
-var balloonSvgHTML = "\n<svg\n\nstyle=\"width: var(".concat(widthProperty, "); height: var(").concat(heightProperty, ");\"\nviewBox=\"0 0 223 609\"\nfill=\"none\"\nxmlns=\"http://www.w3.org/2000/svg\"\n>\n<g opacity=\"0.8\" filter=\"url(#filter0_f_102_49)\" >\n  <path\n    d=\"M117.5 253C136.167 294.5 134.7 395 125.5 453C116.3 511 133.833 578.167 125.5 606\"\n    stroke=\"url(#paint0_linear_102_49)\"\n    stroke-width=\"2\"\n  />\n</g>\n<g opacity=\"0.85\" filter=\"url(#filter1_ii_102_49)\">\n  <path\n    fill-rule=\"evenodd\"\n    clip-rule=\"evenodd\"\n    d=\"M176.876 204.032C181.934 198.064 209.694 160.262 210.899 127.619C213.023 70.1236 176.876 13 118.337 13C55.7949 13 18.5828 69.332 22.2724 127.619C24.0956 156.423 38.9766 178.5 51.7922 195.372C57.7811 203.257 90.0671 238.749 112.15 245.044C111.698 248.246 112.044 253.284 116.338 254H121.838V245.71C143.277 242.292 172.085 209.686 176.876 204.032Z\"\n    fill=\"var(").concat(balloonColorProperty, ", ").concat(defaultBalloonColor, ")\"\n  />\n</g>\n<g filter=\"url(#filter2_f_102_49)\">\n  <path\n    d=\"M125 256.5C125 258.433 122.09 260 118.5 260C114.91 260 112 258.433 112 256.5C112 254.567 114.91 255 118.5 255C122.09 255 125 254.567 125 256.5Z\"\n    fill=\"var(").concat(balloonColorProperty, ", ").concat(defaultBalloonColor, ")\"\n  />\n</g>\n<g opacity=\"0.2\" filter=\"url(#filter3_f_102_49)\">\n  <path\n    d=\"M178.928 128.12C178.011 152.146 172.137 162.97 154.623 184.2C141.594 199.992 128.28 215 112.805 215C104.349 215 92.739 215 65.2673 177.844C56.1123 165.461 45.4818 149.259 44.1794 128.12C41.5436 85.3424 68.1267 44 112.805 44C154.623 44 180.55 85.6242 178.928 128.12Z\"\n    fill=\"url(#paint1_radial_102_49)\"\n  />\n</g>\n<g\n  style=\"mix-blend-mode: lighten\"\n  opacity=\"0.7\"\n  filter=\"url(#filter4_df_102_49)\"\n>\n  <path\n    d=\"M72.7992 108.638L74.0985 87.5247C74.3145 84.0152 77.4883 81.4427 80.9664 81.958L94.8619 84.0166C98.4018 84.541 100.699 88.0277 99.7828 91.4871L94.0502 113.144C93.1964 116.369 89.8758 118.278 86.659 117.394L77.1969 114.792C74.4599 114.039 72.6249 111.471 72.7992 108.638Z\"\n    fill=\"var(").concat(lightColorProperty, ", ").concat(defaultLightColor, ")\"\n  />\n</g>\n<g\n  style=\"mix-blend-mode: lighten\"\n  opacity=\"0.5\"\n  filter=\"url(#filter5_f_102_49)\"\n>\n  <path\n    d=\"M147.76 88.7366L144.842 67.9855C144.378 64.687 141.316 62.3976 138.021 62.8858L123.638 65.0166C120.098 65.541 117.801 69.0277 118.717 72.4871L124.462 94.1891C125.311 97.3967 128.602 99.3061 131.808 98.4512L143.364 95.3695C146.296 94.5878 148.182 91.7409 147.76 88.7366Z\"\n    fill=\"var(").concat(lightColorProperty, ", ").concat(defaultLightColor, ")\"\n  />\n</g>\n<g style=\"mix-blend-mode: lighten\" filter=\"url(#filter6_f_102_49)\">\n  <path\n    d=\"M46.4087 131.164C38.1642 111.726 43.2454 91.2599 47.4381 82.0988C47.7504 81.4164 48.5574 80.8601 48.8712 81.5418C48.9711 81.7589 48.9188 82.1169 48.8357 82.3409C41.2341 102.832 45.5154 122.958 47.3397 130.925C47.8434 133.124 47.2898 133.242 46.4087 131.164Z\"\n    fill=\"var(").concat(lightColorProperty, ", ").concat(defaultLightColor, ")\"\n  />\n</g>\n<g style=\"mix-blend-mode: lighten\" filter=\"url(#filter7_f_102_49)\">\n  <path\n    d=\"M46.4087 131.164C38.1642 111.726 43.2454 91.2599 47.4381 82.0988C47.7504 81.4164 48.5574 80.8601 48.8712 81.5418C48.9711 81.7589 48.9188 82.1169 48.8357 82.3409C41.2341 102.832 45.5154 122.958 47.3397 130.925C47.8434 133.124 47.2898 133.242 46.4087 131.164Z\"\n    fill=\"var(").concat(lightColorProperty, ", ").concat(defaultLightColor, ")\"\n  />\n</g>\n<g opacity=\"0.3\">\n  <g style=\"mix-blend-mode: lighten\" filter=\"url(#filter8_f_102_49)\">\n    <path\n      d=\"M190.817 150.078C196.906 136.754 196.503 119.258 195.396 111.05C195.318 110.475 194.888 109.925 194.734 110.403C194.704 110.495 194.689 110.697 194.699 110.807C196.396 129.344 191.942 144.593 190.447 149.824C190.122 150.959 190.349 151.104 190.817 150.078Z\"\n      fill=\"var(").concat(lightColorProperty, ", ").concat(defaultLightColor, ")\"\n    />\n  </g>\n  <g style=\"mix-blend-mode: lighten\" filter=\"url(#filter9_f_102_49)\">\n    <path\n      d=\"M190.817 150.078C196.906 136.754 196.503 119.258 195.396 111.05C195.318 110.475 194.888 109.925 194.734 110.403C194.704 110.495 194.689 110.697 194.699 110.807C196.396 129.344 191.942 144.593 190.447 149.824C190.122 150.959 190.349 151.104 190.817 150.078Z\"\n      fill=\"var(").concat(lightColorProperty, ", ").concat(defaultLightColor, ")\"\n    />\n  </g>\n</g>\n</svg>\n");
-var svgFiltersHtml = "\n<svg>\n  <defs>\n    <filter\n      id=\"filter0_f_102_49\"\n      x=\"114.588\"\n      y=\"250.59\"\n      width=\"20.5082\"\n      height=\"357.697\"\n      filterUnits=\"userSpaceOnUse\"\n      color-interpolation-filters=\"sRGB\"\n    >\n      <feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\" />\n      <feBlend\n        mode=\"normal\"\n        in=\"SourceGraphic\"\n        in2=\"BackgroundImageFix\"\n        result=\"shape\"\n      />\n      <feGaussianBlur\n        stdDeviation=\"1\"\n        result=\"effect1_foregroundBlur_102_49\"\n      />\n    </filter>\n    <filter\n      id=\"filter1_ii_102_49\"\n      x=\"22.0213\"\n      y=\"13\"\n      width=\"188.967\"\n      height=\"241\"\n      filterUnits=\"userSpaceOnUse\"\n      color-interpolation-filters=\"sRGB\"\n    >\n      <feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\" />\n      <feBlend\n        mode=\"normal\"\n        in=\"SourceGraphic\"\n        in2=\"BackgroundImageFix\"\n        result=\"shape\"\n      />\n      <feColorMatrix\n        in=\"SourceAlpha\"\n        type=\"matrix\"\n        values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"\n        result=\"hardAlpha\"\n      />\n      <feOffset />\n      <feGaussianBlur stdDeviation=\"4.5\" />\n      <feComposite in2=\"hardAlpha\" operator=\"arithmetic\" k2=\"-1\" k3=\"1\" />\n      <feColorMatrix\n        type=\"matrix\"\n        values=\"0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.4 0\"\n      />\n      <feBlend\n        mode=\"normal\"\n        in2=\"shape\"\n        result=\"effect1_innerShadow_102_49\"\n      />\n      <feColorMatrix\n        in=\"SourceAlpha\"\n        type=\"matrix\"\n        values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"\n        result=\"hardAlpha\"\n      />\n      <feOffset />\n      <feGaussianBlur stdDeviation=\"18\" />\n      <feComposite in2=\"hardAlpha\" operator=\"arithmetic\" k2=\"-1\" k3=\"1\" />\n      <feColorMatrix\n        type=\"matrix\"\n        values=\"0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0\"\n      />\n      <feBlend\n        mode=\"overlay\"\n        in2=\"effect1_innerShadow_102_49\"\n        result=\"effect2_innerShadow_102_49\"\n      />\n    </filter>\n    <filter\n      id=\"filter2_f_102_49\"\n      x=\"111\"\n      y=\"253.959\"\n      width=\"15\"\n      height=\"7.04138\"\n      filterUnits=\"userSpaceOnUse\"\n      color-interpolation-filters=\"sRGB\"\n    >\n      <feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\" />\n      <feBlend\n        mode=\"normal\"\n        in=\"SourceGraphic\"\n        in2=\"BackgroundImageFix\"\n        result=\"shape\"\n      />\n      <feGaussianBlur\n        stdDeviation=\"0.5\"\n        result=\"effect1_foregroundBlur_102_49\"\n      />\n    </filter>\n    <filter\n      id=\"filter3_f_102_49\"\n      x=\"0\"\n      y=\"0\"\n      width=\"223\"\n      height=\"259\"\n      filterUnits=\"userSpaceOnUse\"\n      color-interpolation-filters=\"sRGB\"\n    >\n      <feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\" />\n      <feBlend\n        mode=\"normal\"\n        in=\"SourceGraphic\"\n        in2=\"BackgroundImageFix\"\n        result=\"shape\"\n      />\n      <feGaussianBlur\n        stdDeviation=\"22\"\n        result=\"effect1_foregroundBlur_102_49\"\n      />\n    </filter>\n    <filter\n      id=\"filter4_df_102_49\"\n      x=\"46.7878\"\n      y=\"59.8922\"\n      width=\"79.1969\"\n      height=\"87.7179\"\n      filterUnits=\"userSpaceOnUse\"\n      color-interpolation-filters=\"sRGB\"\n    >\n      <feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\" />\n      <feColorMatrix\n        in=\"SourceAlpha\"\n        type=\"matrix\"\n        values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"\n        result=\"hardAlpha\"\n      />\n      <feOffset dy=\"4\" />\n      <feGaussianBlur stdDeviation=\"13\" />\n      <feComposite in2=\"hardAlpha\" operator=\"out\" />\n      <feColorMatrix\n        type=\"matrix\"\n        values=\"0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.8 0\"\n      />\n      <feBlend\n        mode=\"overlay\"\n        in2=\"BackgroundImageFix\"\n        result=\"effect1_dropShadow_102_49\"\n      />\n      <feBlend\n        mode=\"normal\"\n        in=\"SourceGraphic\"\n        in2=\"effect1_dropShadow_102_49\"\n        result=\"shape\"\n      />\n      <feGaussianBlur\n        stdDeviation=\"5.5\"\n        result=\"effect2_foregroundBlur_102_49\"\n      />\n    </filter>\n    <filter\n      id=\"filter5_f_102_49\"\n      x=\"102.515\"\n      y=\"46.8202\"\n      width=\"61.3035\"\n      height=\"67.8351\"\n      filterUnits=\"userSpaceOnUse\"\n      color-interpolation-filters=\"sRGB\"\n    >\n      <feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\" />\n      <feBlend\n        mode=\"normal\"\n        in=\"SourceGraphic\"\n        in2=\"BackgroundImageFix\"\n        result=\"shape\"\n      />\n      <feGaussianBlur\n        stdDeviation=\"8\"\n        result=\"effect1_foregroundBlur_102_49\"\n      />\n    </filter>\n    <filter\n      id=\"filter6_f_102_49\"\n      x=\"34\"\n      y=\"73.2313\"\n      width=\"22.9258\"\n      height=\"67.4198\"\n      filterUnits=\"userSpaceOnUse\"\n      color-interpolation-filters=\"sRGB\"\n    >\n      <feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\" />\n      <feBlend\n        mode=\"normal\"\n        in=\"SourceGraphic\"\n        in2=\"BackgroundImageFix\"\n        result=\"shape\"\n      />\n      <feGaussianBlur\n        stdDeviation=\"4\"\n        result=\"effect1_foregroundBlur_102_49\"\n      />\n    </filter>\n    <filter\n      id=\"filter7_f_102_49\"\n      x=\"40\"\n      y=\"79.2313\"\n      width=\"10.9258\"\n      height=\"55.4198\"\n      filterUnits=\"userSpaceOnUse\"\n      color-interpolation-filters=\"sRGB\"\n    >\n      <feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\" />\n      <feBlend\n        mode=\"normal\"\n        in=\"SourceGraphic\"\n        in2=\"BackgroundImageFix\"\n        result=\"shape\"\n      />\n      <feGaussianBlur\n        stdDeviation=\"1\"\n        result=\"effect1_foregroundBlur_102_49\"\n      />\n    </filter>\n    <filter\n      id=\"filter8_f_102_49\"\n      x=\"186.419\"\n      y=\"106.345\"\n      width=\"13.5106\"\n      height=\"48.2987\"\n      filterUnits=\"userSpaceOnUse\"\n      color-interpolation-filters=\"sRGB\"\n    >\n      <feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\" />\n      <feBlend\n        mode=\"normal\"\n        in=\"SourceGraphic\"\n        in2=\"BackgroundImageFix\"\n        result=\"shape\"\n      />\n      <feGaussianBlur\n        stdDeviation=\"1.93775\"\n        result=\"effect1_foregroundBlur_102_49\"\n      />\n    </filter>\n    <filter\n      id=\"filter9_f_102_49\"\n      x=\"189.326\"\n      y=\"109.252\"\n      width=\"7.69731\"\n      height=\"42.4855\"\n      filterUnits=\"userSpaceOnUse\"\n      color-interpolation-filters=\"sRGB\"\n    >\n      <feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\" />\n      <feBlend\n        mode=\"normal\"\n        in=\"SourceGraphic\"\n        in2=\"BackgroundImageFix\"\n        result=\"shape\"\n      />\n      <feGaussianBlur\n        stdDeviation=\"0.484439\"\n        result=\"effect1_foregroundBlur_102_49\"\n      />\n    </filter>\n    <linearGradient\n      id=\"paint0_linear_102_49\"\n      x1=\"124.798\"\n      y1=\"253\"\n      x2=\"124.798\"\n      y2=\"606\"\n      gradientUnits=\"userSpaceOnUse\"\n    >\n      <stop stop-color=\"white\" />\n      <stop offset=\"0.474934\" stop-color=\"grey\" stop-opacity=\"0.1\" />\n      <stop offset=\"0.722707\" stop-color=\"white\" stop-opacity=\"0.6\" />\n      <stop offset=\"0.93469\" stop-color=\"grey\" stop-opacity=\"0.7\" />\n      <stop offset=\"1\" stop-color=\"white\" stop-opacity=\"0\" />\n    </linearGradient>\n    <radialGradient\n      id=\"paint1_radial_102_49\"\n      cx=\"0\"\n      cy=\"0\"\n      r=\"1\"\n      gradientUnits=\"userSpaceOnUse\"\n      gradientTransform=\"translate(134 149.5) rotate(-123.69) scale(82.9277 65.4692)\"\n    >\n      <stop />\n      <stop offset=\"1\" stop-opacity=\"0\" />\n    </radialGradient>\n  </defs>\n</svg>\n";
 
-var easings = [
-    // easeOutQuint
-    "cubic-bezier(0.22, 1, 0.36, 1)",
-    // easeOutCubic
-    "cubic-bezier(0.33, 1, 0.68, 1)",
-];
-var colorPairs = [
-    // yellow
-    ["#ffec37ee", "#f8b13dff"],
-    // red
-    ["#f89640ee", "#c03940ff"],
-    //blue
-    ["#3bc0f0ee", "#0075bcff"],
-    // green
-    ["#b0cb47ee", "#3d954bff"],
-    // purple
-    ["#cf85b8ee", "#a3509dff"],
-];
 var audioCtx = null;
 function playPopSound() {
     try {
         var AudioCtxClass = window.AudioContext || window.webkitAudioContext;
         if (!AudioCtxClass) return;
         if (!audioCtx) audioCtx = new AudioCtxClass();
-        if (audioCtx.state === 'suspended') {
+        if (audioCtx.state === "suspended") {
             audioCtx.resume().catch(function(){});
         }
         var now = audioCtx.currentTime;
         var osc = audioCtx.createOscillator();
         var gain = audioCtx.createGain();
         
-        osc.type = 'triangle';
+        osc.type = "triangle";
         osc.frequency.setValueAtTime(640 + Math.random() * 220, now);
         osc.frequency.exponentialRampToValueAtTime(70, now + 0.075);
         
@@ -263,18 +284,16 @@ function popBalloon(balloon, onPopCallback) {
     var rect = balloon.getBoundingClientRect();
     var centerX = rect.left + rect.width / 2;
     var centerY = rect.top + Math.min(rect.height * 0.35, 120);
-    var color = balloon.style.getPropertyValue(balloonColorProperty) || "#f89640";
+    var color = balloon.style.getPropertyValue("--balloon-color") || "#f89640";
     
-    // Animate balloon burst
     balloon.style.transition = "transform 0.12s cubic-bezier(0.1, 0.9, 0.2, 1.2), opacity 0.12s ease-out";
     balloon.style.transform = (balloon.style.transform || "") + " scale(1.38)";
     balloon.style.opacity = "0";
     
-    // Spawn 10 bursting particles
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 12; i++) {
         var particle = document.createElement("div");
-        var angle = (i / 10) * Math.PI * 2 + (Math.random() - 0.5) * 0.6;
-        var dist = 32 + Math.random() * 65;
+        var angle = (i / 12) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+        var dist = 32 + Math.random() * 70;
         var size = 4 + Math.random() * 6;
         var dx = Math.cos(angle) * dist;
         var dy = Math.sin(angle) * dist;
@@ -305,19 +324,23 @@ function popBalloon(balloon, onPopCallback) {
     }
     
     setTimeout(function() {
-        balloon.remove();
+        if (balloon.parentNode) {
+            balloon.remove();
+        }
         if (typeof onPopCallback === "function") {
             onPopCallback();
         }
     }, 130);
 }
 
-function createBalloonAnimation(_a) {
-    var balloon = _a.balloon, x = _a.x, y = _a.y, z = _a.z, targetX = _a.targetX, targetY = _a.targetY, targetZ = _a.targetZ, zIndex = _a.zIndex, duration = _a.duration, delay = _a.delay;
+function createBalloonAnimation(opts) {
+    var balloon = opts.balloon, x = opts.x, y = opts.y, z = opts.z, targetX = opts.targetX, targetY = opts.targetY, targetZ = opts.targetZ, zIndex = opts.zIndex, duration = opts.duration, delay = opts.delay;
     balloon.style.zIndex = (zIndex || 20).toString();
-    var tiltAngle = Math.random() * (14 - 6) + 6;
+    var tiltAngle = Math.random() * (12 - 5) + 5;
     var tiltDirection = Math.random() < 0.5 ? 1 : -1;
-    var dur = duration || (4200 + Math.random() * 2200);
+    var dur = duration || (4500 + Math.random() * 2000);
+    
+    balloon.style.transform = "translate(-50%, 0%) translate3d(" + x + "px, " + y + "px, " + z + "px) rotate3d(0, 0, 1, " + (tiltDirection * -tiltAngle) + "deg)";
     
     var anim = balloon.animate([
         {
@@ -335,13 +358,14 @@ function createBalloonAnimation(_a) {
         },
     ], {
         duration: dur,
-        easing: "cubic-bezier(0.25, 1, 0.5, 1)",
+        easing: "linear",
         delay: delay || 0,
         fill: "both",
     });
     balloon._anim = anim;
-    return { balloon: balloon, anim: anim };
+    return { balloon: balloon, anim: anim, duration: dur, delay: delay || 0 };
 }
+
 function balloons() {
     return new Promise(function (resolve) {
         var balloonsContainer = document.createElement("balloons");
@@ -356,15 +380,15 @@ function balloons() {
             perspectiveOrigin: "50vw 100vh",
         });
         document.documentElement.appendChild(balloonsContainer);
-        var sceneSize = { width: window.innerWidth, height: window.innerHeight };
+        var sceneSize = { width: window.innerWidth || 800, height: window.innerHeight || 600 };
         var balloonHeight = Math.min(220, Math.max(130, Math.floor(Math.min(sceneSize.width, sceneSize.height) * 0.28)));
-        var balloonWidth = (balloonDefaultSize.width / balloonDefaultSize.height) * balloonHeight;
-        var amount = Math.max(14, Math.min(24, Math.round(window.innerWidth / 70)));
+        var balloonWidth = Math.round((223 / 609) * balloonHeight);
+        var amount = Math.max(10, Math.min(18, Math.round((window.innerWidth || 800) / 90)));
         var maxDist = Math.max((amount * balloonWidth) / 2, (balloonWidth / 2) * 6);
         var balloonPositions = [];
         for (var i = 0; i < amount; i++) {
             var x = Math.round(sceneSize.width * (0.05 + (i / amount) * 0.9 + (Math.random() - 0.5) * 0.08));
-            var y = window.innerHeight + 20;
+            var y = sceneSize.height + 20;
             var z = Math.round(-1 * (Math.random() * maxDist));
             var targetX = Math.round(x + (Math.random() - 0.5) * balloonWidth * 2);
             var targetY = -balloonHeight - 120;
@@ -380,39 +404,44 @@ function balloons() {
         }
         balloonPositions = balloonPositions.sort(function (a, b) { return a.z - b.z; });
         var closestBallonPosition = balloonPositions[balloonPositions.length - 1];
-        balloonPositions = balloonPositions.map(function (pos) { return (__assign(__assign({}, pos), { z: pos.z - closestBallonPosition.z, targetZ: pos.z - closestBallonPosition.z })); });
-        var filtersElement = document.createElement("div");
-        filtersElement.innerHTML = svgFiltersHtml;
-        balloonsContainer.appendChild(filtersElement);
+        balloonPositions = balloonPositions.map(function (pos) { return Object.assign({}, pos, { z: pos.z - closestBallonPosition.z, targetZ: pos.z - closestBallonPosition.z }); });
+        
         var currentZIndex = 1;
-        var animations = balloonPositions.map(function (pos, index) {
-            var colorPair = colorPairs[index % colorPairs.length];
+        var remainingCount = balloonPositions.length;
+        function checkDone() {
+            remainingCount--;
+            if (remainingCount <= 0) {
+                if (balloonsContainer.parentNode) balloonsContainer.remove();
+                resolve();
+            }
+        }
+        
+        balloonPositions.forEach(function (pos, index) {
+            var palette = colorPalettes[index % colorPalettes.length];
             var balloon = createBallonElement({
-                balloonColor: colorPair[1],
-                lightColor: colorPair[0],
+                palette: palette,
                 width: balloonWidth,
             });
             balloon.addEventListener("pointerdown", function(e) {
                 e.stopPropagation();
                 e.preventDefault();
-                popBalloon(balloon);
+                popBalloon(balloon, checkDone);
             });
             balloonsContainer.appendChild(balloon);
-            return createBalloonAnimation(__assign(__assign({ balloon: balloon }, pos), { zIndex: currentZIndex++ }));
-        });
-        requestAnimationFrame(function () {
-            var animationPromises = animations.map(function (_a) {
-                var balloon = _a.balloon, anim = _a.anim;
-                var a = anim;
-                var p = (a && a.finished) ? a.finished : Promise.resolve();
-                return p.then(function () {
-                    balloon.remove();
-                });
-            });
-            Promise.all(animationPromises).then(function () {
-                balloonsContainer.remove();
-                resolve();
-            });
+            var animObj = createBalloonAnimation(Object.assign({ balloon: balloon }, pos, { zIndex: currentZIndex++ }));
+            
+            var done = false;
+            function onAnimDone() {
+                if (done) return;
+                done = true;
+                if (!balloon._popped && balloon.parentNode) balloon.remove();
+                checkDone();
+            }
+            if (animObj.anim) {
+                animObj.anim.onfinish = onAnimDone;
+                animObj.anim.oncancel = onAnimDone;
+            }
+            setTimeout(onAnimDone, animObj.duration + 500);
         });
     });
 }
@@ -438,10 +467,6 @@ function startBalloons(container, options) {
         perspective: "1200px",
         perspectiveOrigin: "50% 100%",
     });
-    
-    var filtersElement = document.createElement("div");
-    filtersElement.innerHTML = svgFiltersHtml;
-    balloonsContainer.appendChild(filtersElement);
     root.appendChild(balloonsContainer);
     
     var isRunning = true;
@@ -452,41 +477,42 @@ function startBalloons(container, options) {
     function spawnSingleBalloon(initialY, initialDelay) {
         if (!isRunning) return;
         
-        var w = window.innerWidth;
-        var h = window.innerHeight;
-        var balloonWidth = Math.max(75, Math.min(135, Math.floor(w * 0.12)));
-        var x = Math.round(w * (0.06 + Math.random() * 0.88));
+        var w = window.innerWidth || document.documentElement.clientWidth || 800;
+        var h = window.innerHeight || document.documentElement.clientHeight || 600;
+        var balloonWidth = Math.max(78, Math.min(132, Math.floor(w * 0.12)));
+        var x = Math.round(w * (0.05 + Math.random() * 0.90));
         var y = (initialY !== undefined) ? initialY : (h + 30);
         var z = Math.round(-1 * (Math.random() * 260));
-        var targetX = Math.round(x + (Math.random() - 0.5) * 180);
-        var targetY = -balloonWidth * 3 - 60;
+        var targetX = Math.round(x + (Math.random() - 0.5) * 160);
+        var targetY = -balloonWidth * 3 - 50;
         var targetZ = z;
         
-        var colorPair = colorPairs[colorIdx % colorPairs.length];
+        var palette = colorPalettes[colorIdx % colorPalettes.length];
         colorIdx++;
         
         var balloon = createBallonElement({
-            balloonColor: colorPair[1],
-            lightColor: colorPair[0],
+            palette: palette,
             width: balloonWidth,
         });
         
-        balloon.addEventListener("pointerdown", function(e) {
-            e.stopPropagation();
-            e.preventDefault();
+        function handlePop(e) {
+            if (e) {
+                try { e.stopPropagation(); } catch(_) {}
+            }
             popBalloon(balloon, function() {
                 if (isRunning) {
                     setTimeout(function() { spawnSingleBalloon(); }, 250);
                 }
             });
-        });
+        }
+        balloon.addEventListener("pointerdown", handlePop);
+        balloon.addEventListener("click", handlePop);
         
         balloonsContainer.appendChild(balloon);
         
-        var totalDist = (h + 30) - targetY;
-        var remainingDist = y - targetY;
-        var baseDur = 5000 + Math.random() * 2500;
-        var dur = Math.round(baseDur * (remainingDist / totalDist));
+        var remainingDist = Math.max(60, y - targetY);
+        var speed = 55 + Math.random() * 25; // ~55-80 px/sec (subida suave, serena e natural)
+        var dur = Math.round((remainingDist / speed) * 1000);
         
         var animObj = createBalloonAnimation({
             balloon: balloon,
@@ -497,40 +523,46 @@ function startBalloons(container, options) {
             targetY: targetY,
             targetZ: targetZ,
             zIndex: currentZIndex++,
-            duration: Math.max(2000, dur),
+            duration: Math.max(3800, dur),
             delay: initialDelay || 0,
         });
         
-        var p = (animObj.anim && animObj.anim.finished) ? animObj.anim.finished : Promise.resolve();
-        p.then(function() {
-            if (!balloon._popped) {
+        var cleanedUp = false;
+        function finishHandler() {
+            if (cleanedUp) return;
+            cleanedUp = true;
+            if (!balloon._popped && balloon.parentNode) {
                 balloon.remove();
             }
             if (isRunning) {
                 spawnSingleBalloon();
             }
-        }).catch(function() {
-            balloon.remove();
-        });
+        }
+        
+        if (animObj.anim) {
+            animObj.anim.onfinish = finishHandler;
+            animObj.anim.oncancel = finishHandler;
+        }
+        setTimeout(finishHandler, dur + (initialDelay || 0) + 600);
     }
     
-    // Initial wave distributed across screen height
-    var initialCount = Math.max(10, Math.min(18, Math.round(window.innerWidth / 75)));
-    var h = window.innerHeight;
+    // Spawn initial wave distributed across the whole screen height immediately
+    var initialCount = Math.max(9, Math.min(15, Math.round((window.innerWidth || 800) / 85)));
+    var h = window.innerHeight || 600;
     for (var i = 0; i < initialCount; i++) {
-        var startY = (i === 0) ? (h + 20) : Math.round((i / initialCount) * (h + 50));
-        var stagger = (i === 0) ? 0 : (Math.random() * 100);
+        var startY = Math.round(h * 0.05 + (i / initialCount) * (h * 0.95));
+        var stagger = (i === 0) ? 0 : Math.round(Math.random() * 150);
         spawnSingleBalloon(startY, stagger);
     }
     
-    // Periodic replenishment
+    // Periodic replenishment to maintain balloon density
     spawnTimer = setInterval(function() {
         if (!isRunning) return;
         var activeCount = balloonsContainer.querySelectorAll("balloon").length;
         if (activeCount < initialCount) {
             spawnSingleBalloon();
         }
-    }, 700);
+    }, 850);
     
     activeBalloonsSession = {
         stop: function() {
@@ -539,7 +571,7 @@ function startBalloons(container, options) {
             balloonsContainer.style.transition = "opacity 0.4s ease";
             balloonsContainer.style.opacity = "0";
             setTimeout(function() {
-                balloonsContainer.remove();
+                if (balloonsContainer.parentNode) balloonsContainer.remove();
             }, 450);
         },
         container: balloonsContainer
@@ -553,6 +585,14 @@ function stopBalloons() {
         activeBalloonsSession.stop();
         activeBalloonsSession = null;
     }
+}
+
+if (typeof window !== "undefined") {
+    window.balloons = balloons;
+    window.textBalloons = textBalloons;
+    window.startBalloons = startBalloons;
+    window.stopBalloons = stopBalloons;
+    window.popBalloon = popBalloon;
 }
 
 export { balloons, textBalloons, startBalloons, stopBalloons, popBalloon };
