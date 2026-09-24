@@ -186,7 +186,11 @@ var createBallonElement = function (_a) {
         display: "block",
         transformStyle: "preserve-3d",
         opacity: "1",
-        pointerEvents: "none",
+        pointerEvents: "auto",
+        cursor: "pointer",
+        userSelect: "none",
+        webkitUserSelect: "none",
+        touchAction: "manipulation",
         transformOrigin: "".concat(width / 2, "px ").concat(width / 2, "px"),
         willChange: "transform",
     });
@@ -217,34 +221,126 @@ var colorPairs = [
     // purple
     ["#cf85b8ee", "#a3509dff"],
 ];
-function createBalloonAnimation(_a) {
-    var balloon = _a.balloon, x = _a.x, y = _a.y, z = _a.z, targetX = _a.targetX, targetY = _a.targetY, targetZ = _a.targetZ, zIndex = _a.zIndex;
-    balloon.style.zIndex = (9000 + zIndex).toString();
-    var getAnimation = function () {
-        var tiltAngle = Math.random() * (14 - 6) + 6;
-        var tiltDirection = Math.random() < 0.5 ? 1 : -1;
-        return balloon.animate([
-            {
-                transform: "translate(-50%, 0%) translate3d(" + x + "px, " + y + "px, " + z + "px) rotate3d(0, 0, 1, " + (tiltDirection * -tiltAngle) + "deg)",
-                opacity: 1,
-            },
-            {
-                transform: "translate(-50%, 0%) translate3d(" + (x + (targetX - x) / 2) + "px, " + (y + (targetY - y) / 2) + "px, " + (z + (targetZ - z) / 2) + "px) rotate3d(0, 0, 1, " + (tiltDirection * tiltAngle) + "deg)",
-                opacity: 1,
-                offset: 0.5,
-            },
-            {
-                transform: "translate(-50%, 0%) translate3d(" + targetX + "px, " + targetY + "px, " + targetZ + "px) rotate3d(0, 0, 1, " + (tiltDirection * -tiltAngle) + "deg)",
-                opacity: 1,
-            },
-        ], {
-            duration: 3800 + Math.random() * 1600,
-            easing: "cubic-bezier(0.25, 1, 0.5, 1)",
-            delay: (zIndex - 1) * 80,
-            fill: "both",
+var audioCtx = null;
+function playPopSound() {
+    try {
+        var AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtxClass) return;
+        if (!audioCtx) audioCtx = new AudioCtxClass();
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume().catch(function(){});
+        }
+        var now = audioCtx.currentTime;
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(640 + Math.random() * 220, now);
+        osc.frequency.exponentialRampToValueAtTime(70, now + 0.075);
+        
+        gain.gain.setValueAtTime(0.42, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.075);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.start(now);
+        osc.stop(now + 0.08);
+    } catch (_) {}
+}
+
+function popBalloon(balloon, onPopCallback) {
+    if (!balloon || balloon._popped) return;
+    balloon._popped = true;
+    balloon.style.pointerEvents = "none";
+    
+    playPopSound();
+    
+    if (balloon._anim) {
+        try { balloon._anim.pause(); } catch(_) {}
+    }
+    
+    var rect = balloon.getBoundingClientRect();
+    var centerX = rect.left + rect.width / 2;
+    var centerY = rect.top + Math.min(rect.height * 0.35, 120);
+    var color = balloon.style.getPropertyValue(balloonColorProperty) || "#f89640";
+    
+    // Animate balloon burst
+    balloon.style.transition = "transform 0.12s cubic-bezier(0.1, 0.9, 0.2, 1.2), opacity 0.12s ease-out";
+    balloon.style.transform = (balloon.style.transform || "") + " scale(1.38)";
+    balloon.style.opacity = "0";
+    
+    // Spawn 10 bursting particles
+    for (var i = 0; i < 10; i++) {
+        var particle = document.createElement("div");
+        var angle = (i / 10) * Math.PI * 2 + (Math.random() - 0.5) * 0.6;
+        var dist = 32 + Math.random() * 65;
+        var size = 4 + Math.random() * 6;
+        var dx = Math.cos(angle) * dist;
+        var dy = Math.sin(angle) * dist;
+        
+        Object.assign(particle.style, {
+            position: "fixed",
+            left: centerX + "px",
+            top: centerY + "px",
+            width: size + "px",
+            height: size + "px",
+            borderRadius: "50%",
+            backgroundColor: color,
+            pointerEvents: "none",
+            zIndex: "9999",
+            transform: "translate(-50%, -50%)",
+            transition: "transform 0.36s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.36s ease-out",
+            opacity: "1",
         });
-    };
-    return { balloon: balloon, getAnimation: getAnimation };
+        document.body.appendChild(particle);
+        
+        (function(elem, targetDx, targetDy) {
+            requestAnimationFrame(function() {
+                elem.style.transform = "translate(calc(-50% + " + targetDx + "px), calc(-50% + " + targetDy + "px)) scale(0)";
+                elem.style.opacity = "0";
+                setTimeout(function() { elem.remove(); }, 380);
+            });
+        })(particle, dx, dy);
+    }
+    
+    setTimeout(function() {
+        balloon.remove();
+        if (typeof onPopCallback === "function") {
+            onPopCallback();
+        }
+    }, 130);
+}
+
+function createBalloonAnimation(_a) {
+    var balloon = _a.balloon, x = _a.x, y = _a.y, z = _a.z, targetX = _a.targetX, targetY = _a.targetY, targetZ = _a.targetZ, zIndex = _a.zIndex, duration = _a.duration, delay = _a.delay;
+    balloon.style.zIndex = (zIndex || 20).toString();
+    var tiltAngle = Math.random() * (14 - 6) + 6;
+    var tiltDirection = Math.random() < 0.5 ? 1 : -1;
+    var dur = duration || (4200 + Math.random() * 2200);
+    
+    var anim = balloon.animate([
+        {
+            transform: "translate(-50%, 0%) translate3d(" + x + "px, " + y + "px, " + z + "px) rotate3d(0, 0, 1, " + (tiltDirection * -tiltAngle) + "deg)",
+            opacity: 1,
+        },
+        {
+            transform: "translate(-50%, 0%) translate3d(" + (x + (targetX - x) / 2) + "px, " + (y + (targetY - y) / 2) + "px, " + (z + (targetZ - z) / 2) + "px) rotate3d(0, 0, 1, " + (tiltDirection * tiltAngle) + "deg)",
+            opacity: 1,
+            offset: 0.5,
+        },
+        {
+            transform: "translate(-50%, 0%) translate3d(" + targetX + "px, " + targetY + "px, " + targetZ + "px) rotate3d(0, 0, 1, " + (tiltDirection * -tiltAngle) + "deg)",
+            opacity: 1,
+        },
+    ], {
+        duration: dur,
+        easing: "cubic-bezier(0.25, 1, 0.5, 1)",
+        delay: delay || 0,
+        fill: "both",
+    });
+    balloon._anim = anim;
+    return { balloon: balloon, anim: anim };
 }
 function balloons() {
     return new Promise(function (resolve) {
@@ -296,13 +392,18 @@ function balloons() {
                 lightColor: colorPair[0],
                 width: balloonWidth,
             });
+            balloon.addEventListener("pointerdown", function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                popBalloon(balloon);
+            });
             balloonsContainer.appendChild(balloon);
             return createBalloonAnimation(__assign(__assign({ balloon: balloon }, pos), { zIndex: currentZIndex++ }));
         });
         requestAnimationFrame(function () {
             var animationPromises = animations.map(function (_a) {
-                var balloon = _a.balloon, getAnimation = _a.getAnimation;
-                var a = getAnimation();
+                var balloon = _a.balloon, anim = _a.anim;
+                var a = anim;
                 var p = (a && a.finished) ? a.finished : Promise.resolve();
                 return p.then(function () {
                     balloon.remove();
@@ -316,4 +417,142 @@ function balloons() {
     });
 }
 
-export { balloons, textBalloons };
+var activeBalloonsSession = null;
+
+function startBalloons(container, options) {
+    options = options || {};
+    var root = container || document.body;
+    
+    if (activeBalloonsSession) {
+        stopBalloons();
+    }
+    
+    var balloonsContainer = document.createElement("balloons-container");
+    Object.assign(balloonsContainer.style, {
+        overflow: "hidden",
+        position: "absolute",
+        inset: "0",
+        zIndex: "10",
+        display: "block",
+        pointerEvents: "none",
+        perspective: "1200px",
+        perspectiveOrigin: "50% 100%",
+    });
+    
+    var filtersElement = document.createElement("div");
+    filtersElement.innerHTML = svgFiltersHtml;
+    balloonsContainer.appendChild(filtersElement);
+    root.appendChild(balloonsContainer);
+    
+    var isRunning = true;
+    var spawnTimer = null;
+    var colorIdx = 0;
+    var currentZIndex = 15;
+    
+    function spawnSingleBalloon(initialY, initialDelay) {
+        if (!isRunning) return;
+        
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        var balloonWidth = Math.max(75, Math.min(135, Math.floor(w * 0.12)));
+        var x = Math.round(w * (0.06 + Math.random() * 0.88));
+        var y = (initialY !== undefined) ? initialY : (h + 30);
+        var z = Math.round(-1 * (Math.random() * 260));
+        var targetX = Math.round(x + (Math.random() - 0.5) * 180);
+        var targetY = -balloonWidth * 3 - 60;
+        var targetZ = z;
+        
+        var colorPair = colorPairs[colorIdx % colorPairs.length];
+        colorIdx++;
+        
+        var balloon = createBallonElement({
+            balloonColor: colorPair[1],
+            lightColor: colorPair[0],
+            width: balloonWidth,
+        });
+        
+        balloon.addEventListener("pointerdown", function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            popBalloon(balloon, function() {
+                if (isRunning) {
+                    setTimeout(function() { spawnSingleBalloon(); }, 250);
+                }
+            });
+        });
+        
+        balloonsContainer.appendChild(balloon);
+        
+        var totalDist = (h + 30) - targetY;
+        var remainingDist = y - targetY;
+        var baseDur = 5000 + Math.random() * 2500;
+        var dur = Math.round(baseDur * (remainingDist / totalDist));
+        
+        var animObj = createBalloonAnimation({
+            balloon: balloon,
+            x: x,
+            y: y,
+            z: z,
+            targetX: targetX,
+            targetY: targetY,
+            targetZ: targetZ,
+            zIndex: currentZIndex++,
+            duration: Math.max(2000, dur),
+            delay: initialDelay || 0,
+        });
+        
+        var p = (animObj.anim && animObj.anim.finished) ? animObj.anim.finished : Promise.resolve();
+        p.then(function() {
+            if (!balloon._popped) {
+                balloon.remove();
+            }
+            if (isRunning) {
+                spawnSingleBalloon();
+            }
+        }).catch(function() {
+            balloon.remove();
+        });
+    }
+    
+    // Initial wave distributed across screen height
+    var initialCount = Math.max(10, Math.min(18, Math.round(window.innerWidth / 75)));
+    var h = window.innerHeight;
+    for (var i = 0; i < initialCount; i++) {
+        var startY = (i === 0) ? (h + 20) : Math.round((i / initialCount) * (h + 50));
+        var stagger = (i === 0) ? 0 : (Math.random() * 100);
+        spawnSingleBalloon(startY, stagger);
+    }
+    
+    // Periodic replenishment
+    spawnTimer = setInterval(function() {
+        if (!isRunning) return;
+        var activeCount = balloonsContainer.querySelectorAll("balloon").length;
+        if (activeCount < initialCount) {
+            spawnSingleBalloon();
+        }
+    }, 700);
+    
+    activeBalloonsSession = {
+        stop: function() {
+            isRunning = false;
+            clearInterval(spawnTimer);
+            balloonsContainer.style.transition = "opacity 0.4s ease";
+            balloonsContainer.style.opacity = "0";
+            setTimeout(function() {
+                balloonsContainer.remove();
+            }, 450);
+        },
+        container: balloonsContainer
+    };
+    
+    return activeBalloonsSession;
+}
+
+function stopBalloons() {
+    if (activeBalloonsSession) {
+        activeBalloonsSession.stop();
+        activeBalloonsSession = null;
+    }
+}
+
+export { balloons, textBalloons, startBalloons, stopBalloons, popBalloon };
