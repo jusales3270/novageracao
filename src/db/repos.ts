@@ -125,7 +125,10 @@ export async function gravaDocumento(tx: Tx, escolaId: string, matriculaId: stri
 
 export async function documento(tx: Tx, id: string) {
   const r = await tx.query<{ id: string; nome: string; caminho: string; sha256: string; matricula_id: string }>(
-    'select id, nome, caminho, sha256, matricula_id from documento where id = $1', [id]);
+    `select id, nome, caminho, sha256, matricula_id from documento 
+     where id = $1 
+       and (nullif(current_setting('app.escola_id', true), '') is null or escola_id = nullif(current_setting('app.escola_id', true), '')::uuid)`,
+    [id]);
   return r.rows[0] ?? null;   // RLS: documento de outra escola simplesmente não existe aqui
 }
 

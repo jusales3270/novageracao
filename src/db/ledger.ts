@@ -73,7 +73,10 @@ export async function verifica(tx: Tx, escolaId: string) {
 
 export async function trilha(tx: Tx, matriculaId: string) {
   const r = await tx.query<EventoLedger>(
-    'select seq, tipo, ator, hash, em, payload from evento_ledger where matricula_id = $1 order by seq',
+    `select seq, tipo, ator, hash, em, payload from evento_ledger 
+     where matricula_id = $1 
+       and (nullif(current_setting('app.escola_id', true), '') is null or escola_id = nullif(current_setting('app.escola_id', true), '')::uuid)
+     order by seq`,
     [matriculaId]);
   return r.rows;
 }

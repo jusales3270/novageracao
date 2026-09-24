@@ -45,6 +45,11 @@ describe('Interface de produção', () => {
   });
 
   test('login entra no sistema e mostra quem está operando', async () => {
+    const portal = pg.locator('#btnPortal');
+    if (await portal.isVisible({ timeout: 1500 }).catch(() => false)) {
+      await portal.click();
+      await pg.waitForSelector('#email', { state: 'visible' });
+    }
     await pg.fill('#email', 'secretaria@novageracaoitu.com.br');
     await pg.fill('#senha', 'secretaria-dev-2027');
     await pg.click('#b');

@@ -43,7 +43,7 @@ function json(res: Res, code: number, body: unknown, extra: Record<string, strin
 async function pagina(res: Res, arquivo: string) {
   res.writeHead(200, {
     ...SEG, 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store',
-    'Content-Security-Policy': "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; frame-ancestors 'none'; form-action 'self'",
+    'Content-Security-Policy': "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; script-src 'self' 'unsafe-inline'; frame-ancestors 'none'; form-action 'self'",
   });
   res.end(await readFile(join(PUBLICO, arquivo)));
 }
@@ -114,6 +114,7 @@ const servidor = createServer(async (req, res) => {
       '/icon-512.png': 'image/png',
       '/manifest.json': 'application/manifest+json; charset=utf-8',
       '/sw.js': 'application/javascript; charset=utf-8',
+      '/balloons.js': 'application/javascript; charset=utf-8',
     };
     if (ARQUIVOS_PWA[url.pathname] && (req.method === 'GET' || req.method === 'HEAD')) {
       const nome = url.pathname.slice(1);
