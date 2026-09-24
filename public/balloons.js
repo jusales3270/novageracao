@@ -470,22 +470,42 @@ function startBalloons(container, options) {
     root.appendChild(balloonsContainer);
     
     var isRunning = true;
-    var spawnTimer = null;
     var colorIdx = 0;
     var currentZIndex = 15;
     
-    function spawnSingleBalloon(initialY, initialDelay) {
+    // Distinct horizontal lanes leaving center (36% to 64%) free for the logo
+    var LANES = [0.10, 0.23, 0.35, 0.65, 0.77, 0.90];
+    var activeLanes = {};
+    var laneOrder = [0, 3, 1, 4, 2, 5];
+    var totalLanes = LANES.length;
+    var targetCount = (window.innerWidth < 650) ? 5 : 6;
+    
+    function getAvailableLane() {
+        for (var i = 0; i < laneOrder.length; i++) {
+            var lane = laneOrder[i];
+            if (!activeLanes[lane]) {
+                return lane;
+            }
+        }
+        return Math.floor(Math.random() * totalLanes);
+    }
+    
+    function spawnBalloonInLane(lane, initialY, initialDelay) {
         if (!isRunning) return;
         
         var w = window.innerWidth || document.documentElement.clientWidth || 800;
         var h = window.innerHeight || document.documentElement.clientHeight || 600;
-        var balloonWidth = Math.max(78, Math.min(132, Math.floor(w * 0.12)));
-        var x = Math.round(w * (0.05 + Math.random() * 0.90));
-        var y = (initialY !== undefined) ? initialY : (h + 30);
-        var z = Math.round(-1 * (Math.random() * 260));
-        var targetX = Math.round(x + (Math.random() - 0.5) * 160);
-        var targetY = -balloonWidth * 3 - 50;
+        var balloonWidth = Math.max(72, Math.min(115, Math.floor(w * 0.11)));
+        
+        var laneFraction = LANES[lane % LANES.length];
+        var x = Math.round(w * laneFraction + (Math.random() - 0.5) * 16);
+        var y = (initialY !== undefined) ? initialY : (h + 40);
+        var z = Math.round(-1 * (Math.random() * 220));
+        var targetX = Math.round(x + (Math.random() - 0.5) * 30);
+        var targetY = -balloonWidth * 3 - 60;
         var targetZ = z;
+        
+        activeLanes[lane] = true;
         
         var palette = colorPalettes[colorIdx % colorPalettes.length];
         colorIdx++;
@@ -495,13 +515,25 @@ function startBalloons(container, options) {
             width: balloonWidth,
         });
         
+        var released = false;
+        function releaseLane() {
+            if (!released) {
+                released = true;
+                delete activeLanes[lane];
+            }
+        }
+        
         function handlePop(e) {
             if (e) {
                 try { e.stopPropagation(); } catch(_) {}
             }
+            releaseLane();
             popBalloon(balloon, function() {
                 if (isRunning) {
-                    setTimeout(function() { spawnSingleBalloon(); }, 250);
+                    setTimeout(function() {
+                        var nextLane = getAvailableLane();
+                        spawnBalloonInLane(nextLane);
+                    }, 400);
                 }
             });
         }
@@ -511,7 +543,7 @@ function startBalloons(container, options) {
         balloonsContainer.appendChild(balloon);
         
         var remainingDist = Math.max(60, y - targetY);
-        var speed = 55 + Math.random() * 25; // ~55-80 px/sec (subida suave, serena e natural)
+        var speed = 52 + Math.random() * 20; // ~52-72 px/sec
         var dur = Math.round((remainingDist / speed) * 1000);
         
         var animObj = createBalloonAnimation({
@@ -531,11 +563,19 @@ function startBalloons(container, options) {
         function finishHandler() {
             if (cleanedUp) return;
             cleanedUp = true;
+            releaseLane();
             if (!balloon._popped && balloon.parentNode) {
                 balloon.remove();
             }
             if (isRunning) {
-                spawnSingleBalloon();
+                setTimeout(function() {
+                    if (!isRunning) return;
+                    var currentTotal = balloonsContainer.querySelectorAll("balloon").length;
+                    if (currentTotal < targetCount) {
+                        var nextLane = getAvailableLane();
+                        spawnBalloonInLane(nextLane);
+                    }
+                }, 300);
             }
         }
         
@@ -546,23 +586,26 @@ function startBalloons(container, options) {
         setTimeout(finishHandler, dur + (initialDelay || 0) + 600);
     }
     
-    // Spawn initial wave distributed across the whole screen height immediately
-    var initialCount = Math.max(9, Math.min(15, Math.round((window.innerWidth || 800) / 85)));
-    var h = window.innerHeight || 600;
-    for (var i = 0; i < initialCount; i++) {
-        var startY = Math.round(h * 0.05 + (i / initialCount) * (h * 0.95));
-        var stagger = (i === 0) ? 0 : Math.round(Math.random() * 150);
-        spawnSingleBalloon(startY, stagger);
+    // Spawn exactly targetCount balloons, staggered nicely in altitude across screen
+    var initialAltitudes = [0.15, 0.48, 0.78, 0.32, 0.62, 0.94];
+    for (var i = 0; i < targetCount; i++) {
+        var lane = laneOrder[i];
+        var alt = initialAltitudes[i % initialAltitudes.length];
+        var h = window.innerHeight || 600;
+        var startY = Math.round(h * alt);
+        var stagger = (i === 0) ? 0 : Math.round(Math.random() * 120);
+        spawnBalloonInLane(lane, startY, stagger);
     }
     
-    // Periodic replenishment to maintain balloon density
-    spawnTimer = setInterval(function() {
+    // Periodic safety check ensuring balloon count stays at targetCount without multiplying
+    var spawnTimer = setInterval(function() {
         if (!isRunning) return;
         var activeCount = balloonsContainer.querySelectorAll("balloon").length;
-        if (activeCount < initialCount) {
-            spawnSingleBalloon();
+        if (activeCount < targetCount) {
+            var nextLane = getAvailableLane();
+            spawnBalloonInLane(nextLane);
         }
-    }, 850);
+    }, 1500);
     
     activeBalloonsSession = {
         stop: function() {
