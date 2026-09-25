@@ -247,8 +247,12 @@ const servidor = createServer(async (req, res) => {
   }
 });
 
-servidor.listen(PORTA, () => console.log(JSON.stringify({ nivel: 'info', msg: 'escola nova geração no ar', porta: PORTA, ambiente: AMBIENTE })));
+if (!process.env.VERCEL) {
+  servidor.listen(PORTA, () => console.log(JSON.stringify({ nivel: 'info', msg: 'escola nova geração no ar', porta: PORTA, ambiente: AMBIENTE })));
 
-for (const s of ['SIGTERM', 'SIGINT'] as const) {
-  process.on(s, () => { servidor.close(); encerraRender().finally(() => process.exit(0)); });
+  for (const s of ['SIGTERM', 'SIGINT'] as const) {
+    process.on(s, () => { servidor.close(); encerraRender().finally(() => process.exit(0)); });
+  }
 }
+
+export default servidor;
